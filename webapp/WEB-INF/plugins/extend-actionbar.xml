@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?><plug-in>
+
+    <!-- Plugin Informations -->
+    <name>extend-actionbar</name>
+    <class>fr.paris.lutece.plugins.extend.modules.comment.service.CommentPlugin</class>
+    <version>1.0.0</version>
+    <description>module.extend.actionbar.module.description</description>
+    <provider>module.extend.actionbar.module.provider</provider>
+    <documentation/>
+    <installation/>
+    <changes/>
+    <user-guide/>
+    <provider-url>http://lutece.paris.fr</provider-url>
+    <icon-url>images/admin/skin/plugins/extend/modules/actionbar/extend-actionbar.png</icon-url>
+    <copyright>Copyright 2001-2012 Mairie de Paris</copyright>
+    <core-version-dependency>
+        <min-core-version>4.0.0</min-core-version>
+        <max-core-version/>
+    </core-version-dependency>
+
+    <!-- if the plugin must have a connection pool with parameter : 1 - yes, 0 - no -->
+    <db-pool-required>1</db-pool-required>
+    
+    <admin-features>
+        <admin-feature>
+            <feature-id>MANAGE_ACTION_BUTTONS</feature-id>
+            <feature-title>module.extend.actionbar.adminFeature.manage_action_buttons.name</feature-title>
+            <feature-description>module.extend.actionbar.adminFeature.manage_action_buttons.description</feature-description>
+            <feature-level>2</feature-level>
+            <feature-url>jsp/admin/plugins/extend/modules/actionbar/GetManageActionButtons.jsp</feature-url>
+            <feature-icon-url>images/admin/skin/plugins/extend/modules/actionbar/extend-actionbar.png</feature-icon-url>
+            <feature-documentation-url>jsp/admin/documentation/AdminDocumentation.jsp?doc=admin-extend-actionbar</feature-documentation-url>
+        </admin-feature>
+    </admin-features>
+    
+    <!-- RBAC Resources -->
+    <rbac-resource-types>
+        <rbac-resource-type>
+            <rbac-resource-type-class>
+                fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarResourceIdService
+			</rbac-resource-type-class>
+        </rbac-resource-type>
+    </rbac-resource-types>
+</plug-in>

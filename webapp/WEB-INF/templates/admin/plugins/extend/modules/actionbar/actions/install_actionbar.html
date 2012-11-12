@@ -1,0 +1,17 @@
+<#include "../../../actions/create_extender_from_resource.html">
+<a data-toggle="dropdown" href="#">
+	<i class="icon-share">&nbsp;</i>&nbsp;#i18n{module.extend.actionbar.extender.actionbar.label}
+</a>
+<ul class="dropdown-menu submenu-left">
+	<li>
+		<div class="form-inline">
+			<#assign installed = false>
+			<#assign unremovable = false>
+			<#if extenderTypesInstalled.actionbar??>
+				<#assign installed = true>
+				<#assign unremovable = extenderTypesInstalled.actionbar>
+			</#if>
+			<@createExtenderFromResource extenderType="actionbar" installed=installed unremovable=unremovable labelAdd="#i18n{module.extend.actionbar.create_extender_from_resource.labelAddExtender}" labelRemove="#i18n{module.extend.actionbar.create_extender_from_resource.labelRemoveExtender}" />
+		</div>
+	</li>
+</ul>

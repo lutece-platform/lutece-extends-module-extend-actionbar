@@ -1,0 +1,29 @@
+<#include "/admin/util/editor/editor.html" />
+<div class="row-fluid">
+	<form class="form-horizontal" method="post" action="jsp/admin/plugins/extend/modules/actionbar/DoAddActionButton.jsp">
+		<fieldset>
+			<legend>#i18n{module.extend.actionbar.add_action_button.pageTitle}</legend>
+			<div class="control-group">
+				<label class="control-label" for="name"> #i18n{module.extend.actionbar.add_action_button.labelName} * : </label>
+					<div class="controls">
+					<input type="text" name="name" value="" size="100" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="html_content"> #i18n{module.extend.actionbar.add_action_button.labelHtmlContent} : </label>
+					<div class="controls">
+					<textarea rows="10" class="richtext" cols="100" id="html_content" name="html_content" ></textarea>
+				</div>
+			</div>
+			<div class="form-actions">
+				<button class="btn btn-primary btn-small" name="create" value="#i18n{portal.util.labelCreate}" id="create" title="#i18n{portal.util.labelCreate}">
+					<i class="icon-plus icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelCreate}
+				</button>
+				<button class="btn btn-small" name="cancel" id="cancel" value="#i18n{portal.util.labelBack}" title="#i18n{portal.util.labelBack}">
+					#i18n{portal.util.labelBack}
+				</button>
+			</div>
+		</fieldset>
+	</form>
+</div>
+<@initEditor />

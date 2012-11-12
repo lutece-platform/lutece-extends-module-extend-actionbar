@@ -1,0 +1,30 @@
+<#include "/admin/util/editor/editor.html" />
+<div class="row-fluid">
+	<form class="form-horizontal" method="post" action="jsp/admin/plugins/extend/modules/actionbar/DoModifyActionButton.jsp">
+		<fieldset>
+			<legend>#i18n{module.extend.actionbar.modify_action_button.pageTitle}</legend>
+			<div class="control-group">
+				<label class="control-label" for="name"> #i18n{module.extend.actionbar.add_action_button.labelName} * : </label>
+				<div class="controls">
+					<input type="text" name="name" value="${action_button.name!}" size="100" />
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="html_content"> #i18n{module.extend.actionbar.add_action_button.labelHtmlContent} : </label>
+					<div class="controls">
+					<textarea class="richtext" rows="10" cols="100" id="html_content" name="html_content" >${action_button.htmlContent!}</textarea>
+				</div>
+			</div>
+			<div class="form-actions">
+				<input type="hidden" name="id_action" name="id_action" value="${action_button.idAction!}" />
+				<button class="btn btn-primary btn-small" name="modify" value="#i18n{portal.util.labelModify}" id="modify" title="#i18n{portal.util.labelModify}">
+					<i class="icon-edit icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelModify}
+				</button>
+				<button class="btn btn-small" name="cancel" id="cancel" value="#i18n{portal.util.labelBack}" title="#i18n{portal.util.labelBack}">
+					#i18n{portal.util.labelBack}
+				</button>
+			</div>
+		</fieldset>
+	</form>
+</div>
+<@initEditor />

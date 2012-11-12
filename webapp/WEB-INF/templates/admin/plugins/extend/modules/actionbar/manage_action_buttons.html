@@ -1,0 +1,28 @@
+<div class="row-fluid">
+	<fieldset>
+		<legend>
+			#i18n{module.extend.actionbar.manage_action_buttons.pageTitle}
+			<#if permissions.ADD_ACTION_BUTTON?? && permissions.ADD_ACTION_BUTTON>
+				<div class="pull-right">
+					<a class="btn btn-primary btn-small" href="jsp/admin/plugins/extend/modules/actionbar/GetAddActionButton.jsp" title="#i18n{module.extend.actionbar.manage_action_buttons.addActionButton}" >
+						<i class="icon-plus icon-white">&nbsp;</i><span class="hidden-phone">&nbsp;#i18n{module.extend.actionbar.manage_action_buttons.addActionButton}</span>
+					</a>
+				</div>
+			</#if>
+		</legend>
+		<@dataTable dataTableManager=dataTableManager actionMacro="getActionsActionButton" />
+	</fieldset>
+</div>
+
+<#macro getActionsActionButton item >
+	<#if permissions.MODIFY_ACTION_BUTTON?? && permissions.MODIFY_ACTION_BUTTON>
+		<a class="btn btn-primary btn-small" href="jsp/admin/plugins/extend/modules/actionbar/GetModifyActionButton.jsp?id_action=${item.idAction}" title="#i18n{module.extend.actionbar.manage_action_buttons.modifyActionButton}">
+			<i class="icon-edit icon-white"></i>
+		</a>
+	</#if>
+	<#if permissions.REMOVE_ACTION_BUTTON?? && permissions.REMOVE_ACTION_BUTTON>
+		<a class="btn btn-danger btn-small" href="jsp/admin/plugins/extend/modules/actionbar/ConfirmRemoveActionButton.jsp?id_action=${item.idAction}" title="#i18n{module.extend.actionbar.manage_action_buttons.removeActionButton}">
+			<i class="icon-trash icon-white"></i>
+		</a>
+	</#if>
+</#macro>
