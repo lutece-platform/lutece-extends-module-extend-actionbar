@@ -28,8 +28,19 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 
 
+/**
+ * JspBean of ActionBar plugin.
+ */
 public class ActionbarJspBean extends AdminFeaturesPageJspBean
 {
+    /**
+     * Serial version UID
+     */
+    private static final long serialVersionUID = 3580512845617771375L;
+
+    /**
+     * Right to manage action buttons
+     */
     public static final String MANAGE_ACTION_BUTTONS = "MANAGE_ACTION_BUTTONS";
 
     // PARAMETERS
@@ -68,12 +79,17 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
     // URLS
     private static final String JSP_URL_MANAGE_ACTION_BUTTONS = "jsp/admin/plugins/extend/modules/actionbar/GetManageActionButtons.jsp";
     private static final String JSP_URL_REMOVE_ACTION_BUTTON = "jsp/admin/plugins/extend/modules/actionbar/DoRemoveActionButton.jsp";
-    
+
     // local variables
     @Inject
     private ActionbarService _actionbarService = SpringContextService.getBean( ActionbarService.BEAN_NAME );
     private DataTableManager<ActionButton> _dataTableManager = null;
 
+    /**
+     * Get the manage action buttons page.
+     * @param request The request
+     * @return The HTML content to display
+     */
     public String getManageActionButtons( HttpServletRequest request )
     {
         setPageTitleProperty( PROPERTY_MANAGE_ACTION_BUTTONS_PAGE_TITLE );
@@ -86,7 +102,7 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
             _dataTableManager.addColumn( MESSAGE_LABEL_ACTION_NAME, PARAMETER_ACTION_NAME, true );
             _dataTableManager.addActionColumn( MESSAGE_LABEL_ACTION );
         }
-        _dataTableManager.filterSortAndPaginate( request, _actionbarService.findAll( ) );
+        _dataTableManager.filterSortAndPaginate( request, _actionbarService.findAllActionButtons( ) );
 
         Map<String, Object> model = new HashMap<String, Object>( );
         model.put( MARK_DATA_TABLE_MANAGER, _dataTableManager );
@@ -112,6 +128,12 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
         return strContent;
     }
 
+    /**
+     * Get the page to add an action button
+     * @param request The request
+     * @return A IPluginActionResult containing the URL to redirect to or the
+     *         HTML content to display
+     */
     public IPluginActionResult getAddActionButton( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
@@ -134,10 +156,15 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
                 AdminUserService.getLocale( request ), model );
 
         IPluginActionResult result = new DefaultPluginActionResult( );
-        result.setHtmlContent( template.getHtml( ) );
+        result.setHtmlContent( getAdminPage( template.getHtml( ) ) );
         return result;
     }
 
+    /**
+     * Do create an action button
+     * @param request The request
+     * @return The next URL to redirect to
+     */
     public String doAddActionButton( HttpServletRequest request )
     {
         if ( request.getParameter( PARAMETER_CANCEL ) != null )
@@ -172,6 +199,12 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
         return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
     }
 
+    /**
+     * Get the page to modify an action button
+     * @param request The request
+     * @return A IPluginActionResult containing the URL to redirect to or the
+     *         HTML content to display
+     */
     public IPluginActionResult getModifyActionButton( HttpServletRequest request )
     {
         if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
@@ -217,10 +250,15 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
                 AdminUserService.getLocale( request ), model );
 
         IPluginActionResult result = new DefaultPluginActionResult( );
-        result.setHtmlContent( template.getHtml( ) );
+        result.setHtmlContent( getAdminPage( template.getHtml( ) ) );
         return result;
     }
 
+    /**
+     * Do modify an action button
+     * @param request The request
+     * @return The next URL to redirect to
+     */
     public String doModifyActionButton( HttpServletRequest request )
     {
         if ( request.getParameter( PARAMETER_CANCEL ) != null )
@@ -266,6 +304,11 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
         return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
     }
 
+    /**
+     * Get the confirmation page before removing an action button
+     * @param request The request
+     * @return The next URL to redirect to
+     */
     public String confirmRemoveActionButton( HttpServletRequest request )
     {
         String strId = request.getParameter( PARAMETER_ID_ACTION_BUTTON );
@@ -281,6 +324,11 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
                 AdminMessage.TYPE_CONFIRMATION );
     }
 
+    /**
+     * Do remove an action button
+     * @param request The request
+     * @return The next URL to redirect to
+     */
     public String doRemoveActionButton( HttpServletRequest request )
     {
         String strId = request.getParameter( PARAMETER_ID_ACTION_BUTTON );

@@ -99,11 +99,12 @@ public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarE
     @Override
     public void insert( ActionbarExtenderConfig config )
     {
-        insertActions( config.getIdExtender( ), config.getListActionButtonId( ), ActionbarPlugin.getPlugin( ) );
-        insertActions( config.getIdExtender( ), config.getAndResetListAddedActionButtonId( ),
-                ActionbarPlugin.getPlugin( ) );
-        removeActions( config.getIdExtender( ), config.getAndResetListRemovedActionButtonId( ),
-                ActionbarPlugin.getPlugin( ) );
+        List<Integer> listActionsId = config.getListActionButtonId( );
+        if ( config.getAllButtons( ) )
+        {
+            listActionsId.add( -1 );
+        }
+        insertActions( config.getIdExtender( ), listActionsId, ActionbarPlugin.getPlugin( ) );
     }
 
     /**
@@ -112,10 +113,33 @@ public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarE
     @Override
     public void store( ActionbarExtenderConfig config )
     {
-        insertActions( config.getIdExtender( ), config.getAndResetListAddedActionButtonId( ),
-                ActionbarPlugin.getPlugin( ) );
-        removeActions( config.getIdExtender( ), config.getAndResetListRemovedActionButtonId( ),
-                ActionbarPlugin.getPlugin( ) );
+        ActionbarExtenderConfig oldConfig = load( config.getIdExtender( ) );
+        List<Integer> listNewButtons = config.getListActionButtonId( );
+        if ( oldConfig != null )
+        {
+            // We remove from the list of new buttons the buttons that has already been created
+            listNewButtons.removeAll( oldConfig.getListActionButtonId( ) );
+            // We generate the list of buttons to remove
+            List<Integer> listOldButtons = oldConfig.getListActionButtonId( );
+            listOldButtons.removeAll( config.getListActionButtonId( ) );
+
+            // If we just removed every buttons, we add it the list of buttons to remove
+            if ( oldConfig.getAllButtons( ) && !config.getAllButtons( ) )
+            {
+                listOldButtons.add( -1 );
+            }
+            // We remove old buttons
+            removeActions( config.getIdExtender( ), listOldButtons, ActionbarPlugin.getPlugin( ) );
+
+            // If we just added every buttons, we add it the list of buttons to save
+            if ( config.getAllButtons( ) && !oldConfig.getAllButtons( ) )
+            {
+                listNewButtons.add( -1 );
+            }
+        }
+        // We create new buttons
+        insertActions( config.getIdExtender( ), listNewButtons, ActionbarPlugin.getPlugin( ) );
+
     }
 
     /**
@@ -132,9 +156,20 @@ public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarE
         actionbarExtenderConfig.setIdExtender( nIdExtender );
 
         List<Integer> listActionsIds = new ArrayList<Integer>( );
-        while ( daoUtil.next( ) )
+        int nId = 1;
+        // We break if we found -1 (which means every button)
+        while ( nId > 0 && daoUtil.next( ) )
         {
-            listActionsIds.add( daoUtil.getInt( 1 ) );
+            nId = daoUtil.getInt( 1 );
+            if ( nId > 0 )
+            {
+                listActionsIds.add( nId );
+            }
+            else
+            {
+                actionbarExtenderConfig.setAllButtons( true );
+                actionbarExtenderConfig.setListActionButtonId( new ArrayList<Integer>( ) );
+            }
         }
         actionbarExtenderConfig.setListActionButtonId( listActionsIds );
         daoUtil.free( );

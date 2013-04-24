@@ -1,4 +1,3 @@
-<#include "/admin/util/editor/editor.html" />
 <div class="row-fluid">
 	<form class="form-horizontal" method="post" action="jsp/admin/plugins/extend/modules/actionbar/DoModifyActionButton.jsp">
 		<fieldset>
@@ -12,7 +11,14 @@
 			<div class="control-group">
 				<label class="control-label" for="html_content"> #i18n{module.extend.actionbar.add_action_button.labelHtmlContent} : </label>
 					<div class="controls">
-					<textarea class="richtext" rows="10" cols="100" id="html_content" name="html_content" >${action_button.htmlContent!}</textarea>
+					<textarea rows="10" cols="100" id="html_content" name="html_content" >${action_button.htmlContent!}</textarea>
+					<span class="help-block">
+              	 		#i18n{module.extend.actionbar.add_action_button.labelContentHelp}
+                		<ul>
+                			<li>${r"@id_resource"} : #i18n{module.extend.actionbar.add_action_button.labelIdResource}</li>
+                			<li>${r"@resource_type"} : #i18n{module.extend.actionbar.add_action_button.labelResourceType}</li>
+                		</ul>
+					</span>
 				</div>
 			</div>
 			<div class="form-actions">
@@ -27,4 +33,3 @@
 		</fieldset>
 	</form>
 </div>
-<@initEditor />

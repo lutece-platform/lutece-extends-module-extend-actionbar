@@ -54,4 +54,13 @@ public interface IActionButtonDAO
      *         the given name
      */
     ActionButton findByName( String strName, Plugin plugin );
+
+    /**
+     * Get a list of actions buttons from a list of ids
+     * @param listIdActions The list of ids of action buttons to get
+     * @param plugin The plugin
+     * @return The list of action button, or an empty list if the specified list
+     *         is null or empty, or if no action buttons was found
+     */
+    List<ActionButton> findActionButtons( List<Integer> listIdActions, Plugin plugin );
 }

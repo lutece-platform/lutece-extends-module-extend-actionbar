@@ -15,8 +15,17 @@ import java.util.Locale;
  */
 public class ActionbarResourceIdService extends ResourceIdService
 {
+    /**
+     * Permission key to create action buttons
+     */
     public static final String PERMISSION_ADD_ACTION_BUTTON = "ADD_ACTION_BUTTON";
+    /**
+     * Permission key to modify action buttons
+     */
     public static final String PERMISSION_MODIFY_ACTION_BUTTON = "MODIFY_ACTION_BUTTON";
+    /**
+     * Permission key to remove action buttons
+     */
     public static final String PERMISSION_REMOVE_ACTION_BUTTON = "REMOVE_ACTION_BUTTON";
 
     private static final String PROPERTY_LABEL_RESOURCE_TYPE = "module.extend.actionbar.resourceType.label";

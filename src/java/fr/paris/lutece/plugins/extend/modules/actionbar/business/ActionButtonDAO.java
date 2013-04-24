@@ -18,8 +18,13 @@ public class ActionButtonDAO implements IActionButtonDAO
     private static final String SQL_INSERT = " INSERT INTO extend_actionbar_action( id_action, name, html_content) VALUES (?,?,?) ";
     private static final String SQL_DELETE = " DELETE FROM extend_actionbar_action WHERE id_action = ? ";
     private static final String SQL_UPDATE = " UPDATE extend_actionbar_action SET name = ?, html_content = ? WHERE id_action = ? ";
+    private static final String SQL_QUERY_SELECT_FROM_LIST_ID = " SELECT id_action, name, html_content FROM extend_actionbar_action WHERE id_action IN ( ";
 
     private static final String SQL_QUERY_GET_NEW_PRIMARY_KEY = " SELECT MAX(id_action) FROM extend_actionbar_action ";
+
+    private static final String CONSTANT_CLOSE_PARENTHESIS = ")";
+    private static final String CONSTANT_COMMA = ",";
+    private static final String CONSTANT_QUESTION_MARK = "?";
 
     private int newPrimaryKey( Plugin plugin )
     {
@@ -144,6 +149,46 @@ public class ActionButtonDAO implements IActionButtonDAO
         daoUtil.free( );
 
         return action;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ActionButton> findActionButtons( List<Integer> listIdActions, Plugin plugin )
+    {
+        List<ActionButton> listActions = new ArrayList<ActionButton>( );
+        if ( listIdActions != null && listIdActions.size( ) > 0 )
+        {
+            StringBuilder sbSql = new StringBuilder( SQL_QUERY_SELECT_FROM_LIST_ID );
+            for ( int i = 0; i < listIdActions.size( ); i++ )
+            {
+                sbSql.append( CONSTANT_QUESTION_MARK );
+                if ( i + 1 < listIdActions.size( ) )
+                {
+                    sbSql.append( CONSTANT_COMMA );
+                }
+            }
+            sbSql.append( CONSTANT_CLOSE_PARENTHESIS );
+            DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), plugin );
+            int nIndex = 1;
+            for ( Integer nIdAction : listIdActions )
+            {
+                daoUtil.setInt( nIndex++, nIdAction );
+            }
+            daoUtil.executeQuery( );
+            while ( daoUtil.next( ) )
+            {
+                ActionButton action = new ActionButton( );
+                action.setIdAction( daoUtil.getInt( 1 ) );
+                action.setName( daoUtil.getString( 2 ) );
+                action.setHtmlContent( daoUtil.getString( 3 ) );
+                listActions.add( action );
+            }
+
+            daoUtil.free( );
+        }
+        return listActions;
     }
 
 }

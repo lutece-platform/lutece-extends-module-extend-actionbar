@@ -71,7 +71,7 @@ public class ActionbarResourceExtender extends AbstractResourceExtender
     {
         if ( StringUtils.isNotBlank( strExtenderType ) )
         {
-            return getKey(  ).equals( strExtenderType );
+            return getKey( ).equals( strExtenderType );
         }
 
         return false;
@@ -82,10 +82,10 @@ public class ActionbarResourceExtender extends AbstractResourceExtender
      */
     @Override
     public String getContent( String strIdExtendableResource, String strExtendableResourceType, String strParameters,
-        HttpServletRequest request )
+            HttpServletRequest request )
     {
-        return getResourceExtenderComponent(  )
-                   .getPageAddOn( strIdExtendableResource, strExtendableResourceType, strParameters, request );
+        return getResourceExtenderComponent( ).getPageAddOn( strIdExtendableResource, strExtendableResourceType,
+                strParameters, request );
     }
 
     /**
@@ -102,6 +102,7 @@ public class ActionbarResourceExtender extends AbstractResourceExtender
         if ( defaultConfig != null )
         {
             config.setListActionButtonId( defaultConfig.getListActionButtonId( ) );
+            config.setAllButtons( defaultConfig.getAllButtons( ) );
         }
         _configService.create( config );
     }

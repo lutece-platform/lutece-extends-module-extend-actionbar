@@ -5,6 +5,9 @@ package fr.paris.lutece.plugins.extend.modules.actionbar.business;
  */
 public class ActionButton
 {
+    /**
+     * ActionButton resource type
+     */
     public static final String RESOURCE_TYPE = "ACTION_BUTTON";
 
     private int _nIdAction;

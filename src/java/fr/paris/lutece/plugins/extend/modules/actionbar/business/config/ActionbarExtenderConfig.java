@@ -11,40 +11,17 @@ import java.util.List;
  */
 public class ActionbarExtenderConfig extends ExtenderConfig
 {
-    List<Integer> _listActionButtonId = new ArrayList<Integer>( );
-    List<Integer> _listAddedActionButtonId = new ArrayList<Integer>( );
-    List<Integer> _listRemovedActionButtonId = new ArrayList<Integer>( );
+    private List<Integer> _listActionButtonId = new ArrayList<Integer>( );
+    private boolean _bAllButtons;
 
     /**
      * Get the list of id ActionButton associated to this configuration
-     * @return The list of id ActionButton associated to this
+     * @return A copy of the list of id ActionButton associated to this
      *         configuration
      */
     public List<Integer> getListActionButtonId( )
     {
         return new ArrayList<Integer>( _listActionButtonId );
-    }
-
-    /**
-     * Add an ActionButton id to the list of ActionButton id
-     * associated to this config
-     * @param nActionButtonId The id to add
-     */
-    public void addActionButtonId( Integer nActionButtonId )
-    {
-        _listAddedActionButtonId.add( nActionButtonId );
-        _listActionButtonId.add( nActionButtonId );
-    }
-
-    /**
-     * Remove an ActionButton id from the list of ActionButton id
-     * associated to this config
-     * @param nActionButtonId The id to remove
-     */
-    public void removeActionButtonId( Integer nActionButtonId )
-    {
-        _listRemovedActionButtonId.add( nActionButtonId );
-        _listActionButtonId.remove( nActionButtonId );
     }
 
     /**
@@ -58,25 +35,25 @@ public class ActionbarExtenderConfig extends ExtenderConfig
     }
 
     /**
-     * Get the list of added ActionButton ids, and reset it.
-     * @return The list of added ActionButton ids.
+     * Get the boolean that indicates if this action bar is associated with
+     * every action buttons or not
+     * @return True if this action bar is associated with every action buttons,
+     *         false otherwise
      */
-    public List<Integer> getAndResetListAddedActionButtonId( )
+    public boolean getAllButtons( )
     {
-        List<Integer> listAdded = _listAddedActionButtonId;
-        _listAddedActionButtonId = new ArrayList<Integer>( );
-        return listAdded;
+        return _bAllButtons;
     }
 
     /**
-     * Get the list of removed ActionButton ids, and reset it.
-     * @return The list of removed ActionButton ids.
+     * Set the boolean that indicates if this action bar is associated with
+     * every action buttons or not
+     * @param bAllButtons True if this action bar is associated with every
+     *            action buttons, false otherwise
      */
-    public List<Integer> getAndResetListRemovedActionButtonId( )
+    public void setAllButtons( boolean bAllButtons )
     {
-        List<Integer> listRemoved = _listRemovedActionButtonId;
-        _listRemovedActionButtonId = new ArrayList<Integer>( );
-        return listRemoved;
+        this._bAllButtons = bAllButtons;
     }
 
 }

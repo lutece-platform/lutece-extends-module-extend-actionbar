@@ -1,0 +1,41 @@
+<div class="control-group">
+	<label class="control-label" for="name">#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons} : </label>
+	<div class="controls">
+		<input type="checkbox" name="all_buttons" id="all_buttons" value="true" onclick="javascript:clearSelection();" <#if config.allButtons?? && config.allButtons>checked="checked"</#if>/>
+	</div>
+</div>
+<#if action_buttons?? && 0 < action_buttons?size>
+	<div class="control-group">
+		<label class="control-label" for="html_content">#i18n{module.extend.actionbar.modify_action_bar_config.labelActionButtons} : </label>
+		<#list action_buttons as actionButton>
+			<div class="controls">
+				<label class="checkbox">
+					<#assign associated = false>
+					<#if config.listActionButtonId?? && 0 < config.listActionButtonId?size >
+						<#list config.listActionButtonId as actionButtonsId>
+							<#if actionButtonsId == actionButton.idAction>
+								<#assign associated = true>
+							</#if>
+						</#list>
+					</#if>
+					<input name="action_button" onclick="javascript:$('#all_buttons').attr('checked', false);" type="checkbox" value="${actionButton.idAction}" <#if associated>checked="checked"</#if> >
+					${actionButton.name}
+				</label>
+			</div>
+		</#list>
+	</div>
+</#if>
+<script>
+	function clearSelection( )
+	{
+		if ( document.getElementById('all_buttons').checked )
+		{
+			var checkboxes = document.getElementsByName('action_button');
+			var nb=checkboxes.length;
+			for(i=0;i<nb;i++)
+			{
+				checkboxes[i].checked=false;
+			}
+		}
+	}
+</script>
