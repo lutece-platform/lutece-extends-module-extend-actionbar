@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Home for ActionButton management
  */
-public class ActionButtonHome
+public final class ActionButtonHome
 {
     private static IActionButtonDAO _dao = SpringContextService.getBean( "extend-actionbar.actionButtonDAO" );
 
