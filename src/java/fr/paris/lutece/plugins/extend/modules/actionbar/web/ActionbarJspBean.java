@@ -40,14 +40,14 @@ import org.apache.commons.lang.StringUtils;
 public class ActionbarJspBean extends AdminFeaturesPageJspBean
 {
     /**
-     * Serial version UID
-     */
-    private static final long serialVersionUID = 3580512845617771375L;
-
-    /**
      * Right to manage action buttons
      */
     public static final String MANAGE_ACTION_BUTTONS = "MANAGE_ACTION_BUTTONS";
+
+    /**
+     * Serial version UID
+     */
+    private static final long serialVersionUID = 3580512845617771375L;
 
     // PARAMETERS
     private static final String PARAMETER_ACTION_NAME = "name";
@@ -96,7 +96,7 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
     private ActionbarService _actionbarService = SpringContextService.getBean( ActionbarService.BEAN_NAME );
     private IExtendableResourceTypeService _resourceTypeService = SpringContextService
             .getBean( ExtendableResourceTypeService.BEAN_SERVICE );
-    private DataTableManager<ActionButton> _dataTableManager = null;
+    private DataTableManager<ActionButton> _dataTableManager;
 
     /**
      * Get the manage action buttons page.

@@ -39,7 +39,6 @@ import fr.paris.lutece.plugins.extend.modules.actionbar.business.ActionButton;
 import fr.paris.lutece.plugins.extend.modules.actionbar.business.config.ActionbarExtenderConfig;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarService;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.extender.ActionbarResourceExtender;
-import fr.paris.lutece.plugins.extend.service.extender.IResourceExtenderService;
 import fr.paris.lutece.plugins.extend.service.extender.config.IResourceExtenderConfigService;
 import fr.paris.lutece.plugins.extend.util.ExtendErrorException;
 import fr.paris.lutece.plugins.extend.web.component.AbstractResourceExtenderComponent;
@@ -81,8 +80,6 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
 
     // SERVICES
     @Inject
-    IResourceExtenderService resourceExtenderService;
-    @Inject
     @Named( "extend-actionbar.actionbarExtenderConfigService" )
     private IResourceExtenderConfigService _configService;
     @Inject
@@ -108,7 +105,7 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
         // Method to get the html code of the extension in front office
         ActionbarExtenderConfig config = _configService.find( ActionbarResourceExtender.EXTENDER_TYPE,
                 strIdExtendableResource, strExtendableResourceType );
-        List<ActionButton> listActionsButtons = new ArrayList<ActionButton>( );
+        List<ActionButton> listActionsButtons;
         if ( config.getAllButtons( ) )
         {
             listActionsButtons = _actionbarService.findActionButtonsByResourceType( strExtendableResourceType );

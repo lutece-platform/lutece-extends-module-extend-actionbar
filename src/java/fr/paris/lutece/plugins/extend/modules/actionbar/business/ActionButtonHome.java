@@ -14,6 +14,14 @@ public class ActionButtonHome
     private static IActionButtonDAO _dao = SpringContextService.getBean( "extend-actionbar.actionButtonDAO" );
 
     /**
+     * Private constructor
+     */
+    private ActionButtonHome( )
+    {
+
+    }
+
+    /**
      * Create an action button
      * @param actionButton Action button to save
      * @param plugin The plugin

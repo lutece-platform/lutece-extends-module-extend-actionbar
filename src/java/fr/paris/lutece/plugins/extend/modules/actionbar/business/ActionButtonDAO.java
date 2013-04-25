@@ -28,6 +28,11 @@ public class ActionButtonDAO implements IActionButtonDAO
     private static final String CONSTANT_COMMA = ",";
     private static final String CONSTANT_QUESTION_MARK = "?";
 
+    /**
+     * Get a new primary key for action buttons
+     * @param plugin The plugin
+     * @return The new primary key
+     */
     private int newPrimaryKey( Plugin plugin )
     {
         DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_PRIMARY_KEY, plugin );
