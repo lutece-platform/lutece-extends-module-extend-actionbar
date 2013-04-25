@@ -47,6 +47,15 @@ public interface IActionButtonDAO
     List<ActionButton> findAll( Plugin plugin );
 
     /**
+     * Get the list of action buttons associated with a resource type. Action
+     * buttons associated with every resource types are also returned.
+     * @param strResourceType The resource type of buttons
+     * @param plugin The plugin
+     * @return The list of action buttons
+     */
+    List<ActionButton> findAllByResourceType( String strResourceType, Plugin plugin );
+
+    /**
      * Find an action button from its name
      * @param strName The name of the action button
      * @param plugin The plugin

@@ -12,13 +12,15 @@ import java.util.List;
  */
 public class ActionButtonDAO implements IActionButtonDAO
 {
-    private static final String SQL_QUERY_SELECT = " SELECT id_action, name, html_content FROM extend_actionbar_action WHERE id_action = ? ";
-    private static final String SQL_QUERY_SELECT_BY_NAME = " SELECT id_action, name, html_content FROM extend_actionbar_action WHERE name = ? ";
-    private static final String SQL_QUERY_SELECT_ALL = " SELECT id_action, name, html_content FROM extend_actionbar_action ";
-    private static final String SQL_INSERT = " INSERT INTO extend_actionbar_action( id_action, name, html_content) VALUES (?,?,?) ";
+    private static final String SQL_QUERY_SELECT = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE id_action = ? ";
+    private static final String SQL_QUERY_SELECT_BY_NAME = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE name = ? ";
+    private static final String SQL_QUERY_SELECT_ALL = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action ";
+    private static final String SQL_QUERY_SELECT_ALL_BY_RESOURCE_TYPE = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE resource_type = '"
+            + ActionButton.EVERY_RESOURCE_TYPE + "' OR resource_type = ? ";
+    private static final String SQL_INSERT = " INSERT INTO extend_actionbar_action( id_action, name, html_content, resource_type ) VALUES (?,?,?,?) ";
     private static final String SQL_DELETE = " DELETE FROM extend_actionbar_action WHERE id_action = ? ";
-    private static final String SQL_UPDATE = " UPDATE extend_actionbar_action SET name = ?, html_content = ? WHERE id_action = ? ";
-    private static final String SQL_QUERY_SELECT_FROM_LIST_ID = " SELECT id_action, name, html_content FROM extend_actionbar_action WHERE id_action IN ( ";
+    private static final String SQL_UPDATE = " UPDATE extend_actionbar_action SET name = ?, html_content = ?, resource_type = ? WHERE id_action = ? ";
+    private static final String SQL_QUERY_SELECT_FROM_LIST_ID = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE id_action IN ( ";
 
     private static final String SQL_QUERY_GET_NEW_PRIMARY_KEY = " SELECT MAX(id_action) FROM extend_actionbar_action ";
 
@@ -52,6 +54,7 @@ public class ActionButtonDAO implements IActionButtonDAO
         daoUtil.setInt( 1, actionButton.getIdAction( ) );
         daoUtil.setString( 2, actionButton.getName( ) );
         daoUtil.setString( 3, actionButton.getHtmlContent( ) );
+        daoUtil.setString( 4, actionButton.getResourceType( ) );
         daoUtil.executeUpdate( );
         daoUtil.free( );
     }
@@ -72,6 +75,7 @@ public class ActionButtonDAO implements IActionButtonDAO
             action.setIdAction( daoUtil.getInt( 1 ) );
             action.setName( daoUtil.getString( 2 ) );
             action.setHtmlContent( daoUtil.getString( 3 ) );
+            action.setResourceType( daoUtil.getString( 4 ) );
         }
 
         daoUtil.free( );
@@ -88,7 +92,8 @@ public class ActionButtonDAO implements IActionButtonDAO
         DAOUtil daoUtil = new DAOUtil( SQL_UPDATE, plugin );
         daoUtil.setString( 1, actionButton.getName( ) );
         daoUtil.setString( 2, actionButton.getHtmlContent( ) );
-        daoUtil.setInt( 3, actionButton.getIdAction( ) );
+        daoUtil.setString( 3, actionButton.getResourceType( ) );
+        daoUtil.setInt( 4, actionButton.getIdAction( ) );
         daoUtil.executeUpdate( );
         daoUtil.free( );
     }
@@ -120,6 +125,32 @@ public class ActionButtonDAO implements IActionButtonDAO
             action.setIdAction( daoUtil.getInt( 1 ) );
             action.setName( daoUtil.getString( 2 ) );
             action.setHtmlContent( daoUtil.getString( 3 ) );
+            action.setResourceType( daoUtil.getString( 4 ) );
+            listActions.add( action );
+        }
+
+        daoUtil.free( );
+
+        return listActions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ActionButton> findAllByResourceType( String strResourceType, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_BY_RESOURCE_TYPE, plugin );
+        daoUtil.setString( 1, strResourceType );
+        daoUtil.executeQuery( );
+        List<ActionButton> listActions = new ArrayList<ActionButton>( );
+        while ( daoUtil.next( ) )
+        {
+            ActionButton action = new ActionButton( );
+            action.setIdAction( daoUtil.getInt( 1 ) );
+            action.setName( daoUtil.getString( 2 ) );
+            action.setHtmlContent( daoUtil.getString( 3 ) );
+            action.setResourceType( daoUtil.getString( 4 ) );
             listActions.add( action );
         }
 
@@ -144,6 +175,7 @@ public class ActionButtonDAO implements IActionButtonDAO
             action.setIdAction( daoUtil.getInt( 1 ) );
             action.setName( daoUtil.getString( 2 ) );
             action.setHtmlContent( daoUtil.getString( 3 ) );
+            action.setResourceType( daoUtil.getString( 4 ) );
         }
 
         daoUtil.free( );
@@ -183,6 +215,7 @@ public class ActionButtonDAO implements IActionButtonDAO
                 action.setIdAction( daoUtil.getInt( 1 ) );
                 action.setName( daoUtil.getString( 2 ) );
                 action.setHtmlContent( daoUtil.getString( 3 ) );
+                action.setResourceType( daoUtil.getString( 4 ) );
                 listActions.add( action );
             }
 
@@ -190,5 +223,4 @@ public class ActionButtonDAO implements IActionButtonDAO
         }
         return listActions;
     }
-
 }

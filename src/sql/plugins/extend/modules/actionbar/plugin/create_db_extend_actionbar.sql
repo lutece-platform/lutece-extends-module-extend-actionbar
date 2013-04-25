@@ -3,6 +3,7 @@ CREATE TABLE extend_actionbar_action (
 	id_action INT NOT NULL,
 	name VARCHAR(255) DEFAULT '' NOT NULL,
 	html_content LONG VARCHAR NULL,
+	resource_type VARCHAR(255) NOT NULL,
 	PRIMARY KEY (id_action)
 );
 

@@ -9,10 +9,16 @@ public class ActionButton
      * ActionButton resource type
      */
     public static final String RESOURCE_TYPE = "ACTION_BUTTON";
+    /**
+     * Resource type value indicating that the action button can be used for
+     * every resource type
+     */
+    public static final String EVERY_RESOURCE_TYPE = "*";
 
     private int _nIdAction;
     private String _strName;
     private String _strHtmlContent;
+    private String _strResourceType;
 
     /**
      * Get the id of the action button
@@ -66,6 +72,25 @@ public class ActionButton
     public void setHtmlContent( String strHtmlContent )
     {
         this._strHtmlContent = strHtmlContent;
+    }
+
+    /**
+     * Get the resource type associated with this action button
+     * @return The resource type associated with this action button
+     */
+    public String getResourceType( )
+    {
+        return _strResourceType;
+    }
+
+    /**
+     * Set the resource type associated with this action button
+     * @param strResourceType The resource type associated with this action
+     *            button
+     */
+    public void setResourceType( String strResourceType )
+    {
+        this._strResourceType = strResourceType;
     }
 
 }

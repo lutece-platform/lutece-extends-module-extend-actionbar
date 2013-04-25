@@ -3,8 +3,11 @@ package fr.paris.lutece.plugins.extend.modules.actionbar.web;
 import fr.paris.lutece.plugins.extend.modules.actionbar.business.ActionButton;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarResourceIdService;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarService;
+import fr.paris.lutece.plugins.extend.service.type.ExtendableResourceTypeService;
+import fr.paris.lutece.plugins.extend.service.type.IExtendableResourceTypeService;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
+import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
@@ -15,11 +18,14 @@ import fr.paris.lutece.portal.service.util.AppPropertiesService;
 import fr.paris.lutece.portal.web.admin.AdminFeaturesPageJspBean;
 import fr.paris.lutece.portal.web.pluginaction.DefaultPluginActionResult;
 import fr.paris.lutece.portal.web.pluginaction.IPluginActionResult;
+import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.ReferenceList;
 import fr.paris.lutece.util.datatable.DataTableManager;
 import fr.paris.lutece.util.html.HtmlTemplate;
 import fr.paris.lutece.util.url.UrlItem;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -45,10 +51,12 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
 
     // PARAMETERS
     private static final String PARAMETER_ACTION_NAME = "name";
+    //    private static final String PARAMETER_RESOURCE_TYPE = "resourceType";
     private static final String PARAMETER_CANCEL = "cancel";
     private static final String PARAMETER_ID_ACTION_BUTTON = "id_action";
     private static final String PARAM_NAME = "name";
     private static final String PARAM_HTML_CONTENT = "html_content";
+    private static final String PARAM_RESOURCE_TYPE = "resourceType";
 
     // PROPERTIES
     private static final String PROPERTY_MANAGE_ACTION_BUTTONS_PAGE_TITLE = "module.extend.actionbar.adminFeature.manage_action_buttons.pageTitle";
@@ -62,14 +70,17 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
     private static final String MARK_LOCALE = "locale";
     private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_ACTION_BUTTON = "action_button";
+    private static final String MARK_RESOURCE_TYPES = "resourceTypes";
 
     // MESSAGES
     private static final String MESSAGE_LABEL_ACTION_NAME = "module.extend.actionbar.manage_action_buttons.actionbutton.name";
+    //    private static final String MESSAGE_LABEL_RESOURCE_TYPE = "module.extend.actionbar.manage_action_buttons.actionbutton.resourceType";
     private static final String MESSAGE_LABEL_ACTION = "module.extend.actionbar.manage_action_buttons.actionbutton.action";
     private static final String MESSAGE_UNAUTHORIZED_ACTION = "extend.message.unauthorizedAction";
     private static final String MESSAGE_CONFIRM_REMOVE_SOCIALHUB = "module.extend.actionbar.remove_action_button.confirmRemoveActionButton";
     private static final String MESSAGE_MANDATORY_FIELDS = "portal.util.message.mandatoryFields";
     private static final String MESSAGE_ACTION_BUTTON_NOT_FOUND = "module.extend.actionbar.manage_action_buttons.actionbutton.actionButtonNotFound";
+    private static final String MESSAGE_LABEL_EVERY_RESOURCE_TYPE = "module.extend.actionbar.add_action_button.everyResourceType";
 
     // TEMPLATES
     private static final String TEMPLATE_MANAGE_ACTION_BUTTONS = "admin/plugins/extend/modules/actionbar/manage_action_buttons.html";
@@ -83,6 +94,8 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
     // local variables
     @Inject
     private ActionbarService _actionbarService = SpringContextService.getBean( ActionbarService.BEAN_NAME );
+    private IExtendableResourceTypeService _resourceTypeService = SpringContextService
+            .getBean( ExtendableResourceTypeService.BEAN_SERVICE );
     private DataTableManager<ActionButton> _dataTableManager = null;
 
     /**
@@ -100,6 +113,7 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
                     JSP_URL_MANAGE_ACTION_BUTTONS, AppPropertiesService.getPropertyInt(
                             PROPERTY_DEFAULT_ITEMS_PER_PAGE, 50 ), true );
             _dataTableManager.addColumn( MESSAGE_LABEL_ACTION_NAME, PARAMETER_ACTION_NAME, true );
+            //            _dataTableManager.addColumn( MESSAGE_LABEL_RESOURCE_TYPE, PARAMETER_RESOURCE_TYPE, true );
             _dataTableManager.addActionColumn( MESSAGE_LABEL_ACTION );
         }
         _dataTableManager.filterSortAndPaginate( request, _actionbarService.findAllActionButtons( ) );
@@ -148,9 +162,17 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
 
         setPageTitleProperty( PROPERTY_ADD_ACTION_BUTTON_PAGE_TITLE );
 
+        Locale locale = AdminUserService.getLocale( request );
+        ReferenceList refListResourceTypes = _resourceTypeService.findAllAsRef( locale );
+        ReferenceItem refItem = new ReferenceItem( );
+        refItem.setCode( ActionButton.EVERY_RESOURCE_TYPE );
+        refItem.setName( I18nService.getLocalizedString( MESSAGE_LABEL_EVERY_RESOURCE_TYPE, locale ) );
+        refListResourceTypes.add( 0, refItem );
+
         Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_LOCALE, AdminUserService.getLocale( request ) );
+        model.put( MARK_LOCALE, locale );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
+        model.put( MARK_RESOURCE_TYPES, refListResourceTypes );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ADD_ACTION_BUTTON,
                 AdminUserService.getLocale( request ), model );
@@ -189,10 +211,16 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
+        String strResourceType = request.getParameter( PARAM_RESOURCE_TYPE );
+        if ( StringUtils.isBlank( strResourceType ) )
+        {
+            strResourceType = ActionButton.EVERY_RESOURCE_TYPE;
+        }
 
         ActionButton actionButton = new ActionButton( );
         actionButton.setName( strName );
         actionButton.setHtmlContent( strHtmlContent );
+        actionButton.setResourceType( strResourceType );
 
         _actionbarService.createActionButton( actionButton );
 
@@ -240,11 +268,18 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
                     AdminMessage.TYPE_STOP ) );
             return result;
         }
+        Locale locale = AdminUserService.getLocale( request );
+        ReferenceList refListResourceTypes = _resourceTypeService.findAllAsRef( locale );
+        ReferenceItem refItem = new ReferenceItem( );
+        refItem.setCode( ActionButton.EVERY_RESOURCE_TYPE );
+        refItem.setName( I18nService.getLocalizedString( MESSAGE_LABEL_EVERY_RESOURCE_TYPE, locale ) );
+        refListResourceTypes.add( 0, refItem );
 
         Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_LOCALE, AdminUserService.getLocale( request ) );
+        model.put( MARK_LOCALE, locale );
         model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( MARK_ACTION_BUTTON, actionButton );
+        model.put( MARK_RESOURCE_TYPES, refListResourceTypes );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MODIFY_ACTION_BUTTON,
                 AdminUserService.getLocale( request ), model );
@@ -273,13 +308,9 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
         }
 
         String strName = request.getParameter( PARAM_NAME );
-        if ( StringUtils.isBlank( strName ) )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
-        }
-
         String strHtmlContent = request.getParameter( PARAM_HTML_CONTENT );
-        if ( StringUtils.isBlank( strHtmlContent ) )
+
+        if ( StringUtils.isBlank( strHtmlContent ) || StringUtils.isBlank( strName ) )
         {
             return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
@@ -294,10 +325,17 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
             return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
         }
 
+        String strResourceType = request.getParameter( PARAM_RESOURCE_TYPE );
+        if ( StringUtils.isBlank( strResourceType ) )
+        {
+            strResourceType = ActionButton.EVERY_RESOURCE_TYPE;
+        }
+
         ActionButton actionButton = new ActionButton( );
         actionButton.setName( strName );
         actionButton.setHtmlContent( strHtmlContent );
         actionButton.setIdAction( nIdActionButton );
+        actionButton.setResourceType( strResourceType );
 
         _actionbarService.updateActionButton( actionButton );
 

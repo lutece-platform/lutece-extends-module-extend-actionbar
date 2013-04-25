@@ -21,6 +21,17 @@ public class ActionbarService
     private Plugin _plugin;
 
     /**
+     * Get the list of action buttons associated with a resource type. Action
+     * buttons associated with every resource types are also returned.
+     * @param strResourceType The resource type of buttons
+     * @return The list of action buttons
+     */
+    public List<ActionButton> findActionButtonsByResourceType( String strResourceType )
+    {
+        return ActionButtonHome.findAllByResourceType( strResourceType, getPlugin( ) );
+    }
+
+    /**
      * Get the list of action buttons
      * @return The list of action buttons
      */

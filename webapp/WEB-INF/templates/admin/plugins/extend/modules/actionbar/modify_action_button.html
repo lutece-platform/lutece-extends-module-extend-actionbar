@@ -9,11 +9,20 @@
 				</div>
 			</div>
 			<div class="control-group">
+				<label class="control-label" for="name"> #i18n{module.extend.actionbar.add_action_button.labelResourceType} * : </label>
+				<div class="controls">
+					<@comboWithParams name="resourceType" additionalParameters="class='input-medium'" default_value=action_button.resourceType items=resourceTypes />
+					<span class="help-block">
+						#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}
+					</span>
+				</div>
+			</div>
+			<div class="control-group">
 				<label class="control-label" for="html_content"> #i18n{module.extend.actionbar.add_action_button.labelHtmlContent} : </label>
-					<div class="controls">
+				<div class="controls">
 					<textarea rows="10" cols="100" id="html_content" name="html_content" >${action_button.htmlContent!}</textarea>
 					<span class="help-block">
-              	 		#i18n{module.extend.actionbar.add_action_button.labelContentHelp}
+              	 		#i18n{module.extend.actionbar.add_action_button.labelContentHelp} :
                 		<ul>
                 			<li>${r"@id_resource"} : #i18n{module.extend.actionbar.add_action_button.labelIdResource}</li>
                 			<li>${r"@type_resource"} : #i18n{module.extend.actionbar.add_action_button.labelResourceType}</li>

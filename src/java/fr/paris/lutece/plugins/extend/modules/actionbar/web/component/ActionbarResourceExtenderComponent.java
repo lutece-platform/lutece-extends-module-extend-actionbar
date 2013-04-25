@@ -111,7 +111,7 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
         List<ActionButton> listActionsButtons = new ArrayList<ActionButton>( );
         if ( config.getAllButtons( ) )
         {
-            listActionsButtons = _actionbarService.findAllActionButtons( );
+            listActionsButtons = _actionbarService.findActionButtonsByResourceType( strExtendableResourceType );
         }
         else
         {
@@ -139,7 +139,8 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
     {
         // Method to get the html of the config modification screen
         Map<String, Object> model = new HashMap<String, Object>( );
-        List<ActionButton> listActionButton = _actionbarService.findAllActionButtons( );
+        List<ActionButton> listActionButton = _actionbarService.findActionButtonsByResourceType( resourceExtender
+                .getExtendableResourceType( ) );
         model.put( MARK_ACTION_BUTTONS, listActionButton );
         model.put( MARK_RESOURCE_EXTENDER_CONFIG, getConfig( resourceExtender.getIdExtender( ) ) );
 
