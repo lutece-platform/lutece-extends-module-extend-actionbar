@@ -26,7 +26,7 @@ public final class ActionButtonHome
      * @param actionButton Action button to save
      * @param plugin The plugin
      */
-    public static void create( ActionButton actionButton, Plugin plugin )
+    public static synchronized void create( ActionButton actionButton, Plugin plugin )
     {
         _dao.create( actionButton, plugin );
     }
@@ -54,12 +54,13 @@ public final class ActionButtonHome
 
     /**
      * Delete an action button
-     * @param nIdActionButton The id of the action button to delete
+     * @param actionButton The action button to delete
      * @param plugin The plugin
      */
-    public static void delete( int nIdActionButton, Plugin plugin )
+    public static synchronized void delete( ActionButton actionButton, Plugin plugin )
     {
-        _dao.delete( nIdActionButton, plugin );
+        _dao.delete( actionButton.getIdAction( ), plugin );
+        _dao.fillBlankInOrder( actionButton.getOrder( ), plugin );
     }
 
     /**
@@ -106,5 +107,44 @@ public final class ActionButtonHome
     public static List<ActionButton> findActionButtons( List<Integer> listIdActions, Plugin plugin )
     {
         return _dao.findActionButtons( listIdActions, plugin );
+    }
+
+    /**
+     * Update the order of an action button. The order of the given action
+     * button is set to the new value, and the action button that had this order
+     * gets the old order of the updated one.
+     * @param action The action button to move. The order attribute of the
+     *            action button <b>MUST</b> be its old order.
+     * @param nNewOrder The new order of the topic
+     * @param plugin The plugin
+     */
+    public static synchronized void updateActionButtonOrder( ActionButton action, int nNewOrder, Plugin plugin )
+    {
+        List<ActionButton> listActionButtons = _dao.findByOrder( nNewOrder, plugin );
+        if ( listActionButtons != null && listActionButtons.size( ) > 0 )
+        {
+            _dao.updateActionButtonOrder( listActionButtons.get( 0 ).getIdAction( ), action.getOrder( ), plugin );
+            // If there is more than one button that had the new id of the current button (which should not happen), we put them at the end of the list
+            if ( listActionButtons.size( ) > 1 )
+            {
+                listActionButtons.remove( 0 );
+                int nNextOrder = _dao.getNewOrder( plugin );
+                for ( ActionButton actionButton : listActionButtons )
+                {
+                    _dao.updateActionButtonOrder( actionButton.getIdAction( ), nNextOrder++, plugin );
+                }
+            }
+        }
+        _dao.updateActionButtonOrder( action.getIdAction( ), nNewOrder, plugin );
+    }
+
+    /**
+     * Get the next available order
+     * @param plugin The plugin
+     * @return The next available order
+     */
+    public static int getNewOrder( Plugin plugin )
+    {
+        return _dao.getNewOrder( plugin );
     }
 }

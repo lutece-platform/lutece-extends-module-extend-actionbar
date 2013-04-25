@@ -51,12 +51,14 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
 
     // PARAMETERS
     private static final String PARAMETER_ACTION_NAME = "name";
+    private static final String PARAMETER_ACTION_ORDER = "order";
     //    private static final String PARAMETER_RESOURCE_TYPE = "resourceType";
     private static final String PARAMETER_CANCEL = "cancel";
     private static final String PARAMETER_ID_ACTION_BUTTON = "id_action";
     private static final String PARAM_NAME = "name";
     private static final String PARAM_HTML_CONTENT = "html_content";
     private static final String PARAM_RESOURCE_TYPE = "resourceType";
+    private static final String PARAM_MOVE_UP = "moveUp";
 
     // PROPERTIES
     private static final String PROPERTY_MANAGE_ACTION_BUTTONS_PAGE_TITLE = "module.extend.actionbar.adminFeature.manage_action_buttons.pageTitle";
@@ -71,9 +73,11 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
     private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_ACTION_BUTTON = "action_button";
     private static final String MARK_RESOURCE_TYPES = "resourceTypes";
+    private static final String MARK_LAST_ORDER = "last_order";
 
     // MESSAGES
     private static final String MESSAGE_LABEL_ACTION_NAME = "module.extend.actionbar.manage_action_buttons.actionbutton.name";
+    private static final String MESSAGE_LABEL_ACTION_ORDER = "module.extend.actionbar.manage_action_buttons.actionbutton.order";
     //    private static final String MESSAGE_LABEL_RESOURCE_TYPE = "module.extend.actionbar.manage_action_buttons.actionbutton.resourceType";
     private static final String MESSAGE_LABEL_ACTION = "module.extend.actionbar.manage_action_buttons.actionbutton.action";
     private static final String MESSAGE_UNAUTHORIZED_ACTION = "extend.message.unauthorizedAction";
@@ -113,6 +117,7 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
                     JSP_URL_MANAGE_ACTION_BUTTONS, AppPropertiesService.getPropertyInt(
                             PROPERTY_DEFAULT_ITEMS_PER_PAGE, 50 ), true );
             _dataTableManager.addColumn( MESSAGE_LABEL_ACTION_NAME, PARAMETER_ACTION_NAME, true );
+            _dataTableManager.addColumn( MESSAGE_LABEL_ACTION_ORDER, PARAMETER_ACTION_ORDER, true );
             //            _dataTableManager.addColumn( MESSAGE_LABEL_RESOURCE_TYPE, PARAMETER_RESOURCE_TYPE, true );
             _dataTableManager.addActionColumn( MESSAGE_LABEL_ACTION );
         }
@@ -132,6 +137,7 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
                 ActionButton.RESOURCE_TYPE, null, ActionbarResourceIdService.PERMISSION_REMOVE_ACTION_BUTTON, user ) );
 
         model.put( MARK_PERMISSIONS, mapPermissions );
+        model.put( MARK_LAST_ORDER, _actionbarService.getNewOrder( ) - 1 );
 
         HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_ACTION_BUTTONS,
                 AdminUserService.getLocale( request ), model );
@@ -386,5 +392,39 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
 
         _actionbarService.removeActionButton( nId );
         return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
+    }
+
+    /**
+     * Move an action button
+     * @param request The request
+     * @return The html content to display
+     */
+    public String doMoveActionButton( HttpServletRequest request )
+    {
+        if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
+                ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON, AdminUserService.getAdminUser( request ) ) )
+        {
+            getManageActionButtons( request );
+        }
+
+        boolean bMoveUp = Boolean.parseBoolean( request.getParameter( PARAM_MOVE_UP ) );
+        String strActionId = request.getParameter( PARAMETER_ID_ACTION_BUTTON );
+        if ( StringUtils.isNumeric( strActionId ) )
+        {
+            int nIdAction = Integer.parseInt( strActionId );
+            ActionButton actionButton = _actionbarService.findActionButton( nIdAction );
+            int nOrder = actionButton.getOrder( );
+            if ( bMoveUp )
+            {
+                nOrder--;
+            }
+            else
+            {
+                nOrder++;
+            }
+            _actionbarService.updateActionButtonOrder( actionButton, nOrder );
+        }
+
+        return getManageActionButtons( request );
     }
 }

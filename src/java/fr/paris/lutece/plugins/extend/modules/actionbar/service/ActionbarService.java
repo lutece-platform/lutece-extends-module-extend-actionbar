@@ -85,7 +85,30 @@ public class ActionbarService
      */
     public void removeActionButton( int nIdAction )
     {
-        ActionButtonHome.delete( nIdAction, getPlugin( ) );
+        Plugin plugin = getPlugin( );
+        ActionButtonHome.delete( ActionButtonHome.findById( nIdAction, plugin ), plugin );
+    }
+
+    /**
+     * Update the order of an action button. The order of the given action
+     * button is set to the new value, and the action button that had this order
+     * gets the old order of the updated one.
+     * @param action The action button to move. The order attribute of the
+     *            action button <b>MUST</b> be its old order.
+     * @param nNewOrder The new order of the topic
+     */
+    public void updateActionButtonOrder( ActionButton action, int nNewOrder )
+    {
+        ActionButtonHome.updateActionButtonOrder( action, nNewOrder, getPlugin( ) );
+    }
+
+    /**
+     * Get the next available order
+     * @return The next available order
+     */
+    public int getNewOrder( )
+    {
+        return ActionButtonHome.getNewOrder( getPlugin( ) );
     }
 
     /**

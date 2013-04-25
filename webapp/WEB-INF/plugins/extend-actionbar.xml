@@ -26,7 +26,7 @@
             <feature-id>MANAGE_ACTION_BUTTONS</feature-id>
             <feature-title>module.extend.actionbar.adminFeature.manage_action_buttons.name</feature-title>
             <feature-description>module.extend.actionbar.adminFeature.manage_action_buttons.description</feature-description>
-            <feature-level>2</feature-level>
+            <feature-level>1</feature-level>
             <feature-url>jsp/admin/plugins/extend/modules/actionbar/GetManageActionButtons.jsp</feature-url>
             <feature-icon-url>images/admin/skin/plugins/extend/modules/actionbar/extend-actionbar.png</feature-icon-url>
             <feature-documentation-url>jsp/admin/documentation/AdminDocumentation.jsp?doc=admin-extend-actionbar</feature-documentation-url>

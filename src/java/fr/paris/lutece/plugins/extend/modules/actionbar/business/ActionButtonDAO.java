@@ -12,16 +12,21 @@ import java.util.List;
  */
 public class ActionButtonDAO implements IActionButtonDAO
 {
-    private static final String SQL_QUERY_SELECT = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE id_action = ? ";
-    private static final String SQL_QUERY_SELECT_BY_NAME = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE name = ? ";
-    private static final String SQL_QUERY_SELECT_ALL = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action ";
-    private static final String SQL_QUERY_SELECT_ALL_BY_RESOURCE_TYPE = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE resource_type = '"
-            + ActionButton.EVERY_RESOURCE_TYPE + "' OR resource_type = ? ";
-    private static final String SQL_INSERT = " INSERT INTO extend_actionbar_action( id_action, name, html_content, resource_type ) VALUES (?,?,?,?) ";
+    private static final String SQL_QUERY_SELECT = " SELECT id_action, name, html_content, resource_type, btn_order FROM extend_actionbar_action WHERE id_action = ? ";
+    private static final String SQL_QUERY_SELECT_BY_NAME = " SELECT id_action, name, html_content, resource_type, btn_order FROM extend_actionbar_action WHERE name = ? ";
+    private static final String SQL_QUERY_SELECT_BY_ORDER = " SELECT id_action, name, html_content, resource_type, btn_order FROM extend_actionbar_action WHERE btn_order = ? ";
+    private static final String SQL_QUERY_SELECT_ALL = " SELECT id_action, name, html_content, resource_type, btn_order FROM extend_actionbar_action ORDER BY btn_order ASC ";
+    private static final String SQL_QUERY_SELECT_ALL_BY_RESOURCE_TYPE = " SELECT id_action, name, html_content, resource_type, btn_order FROM extend_actionbar_action WHERE resource_type = '"
+            + ActionButton.EVERY_RESOURCE_TYPE + "' OR resource_type = ? ORDER BY btn_order ASC ";
+    private static final String SQL_QUERY_GET_NEW_ORDER = " SELECT MAX(btn_order) + 1 FROM extend_actionbar_action ";
+    private static final String SQL_INSERT = " INSERT INTO extend_actionbar_action( id_action, name, html_content, resource_type, btn_order ) VALUES (?,?,?,?,?) ";
     private static final String SQL_DELETE = " DELETE FROM extend_actionbar_action WHERE id_action = ? ";
     private static final String SQL_UPDATE = " UPDATE extend_actionbar_action SET name = ?, html_content = ?, resource_type = ? WHERE id_action = ? ";
-    private static final String SQL_QUERY_SELECT_FROM_LIST_ID = " SELECT id_action, name, html_content, resource_type FROM extend_actionbar_action WHERE id_action IN ( ";
+    private static final String SQL_QUERY_SELECT_FROM_LIST_ID = " SELECT id_action, name, html_content, resource_type, btn_order FROM extend_actionbar_action WHERE id_action IN ( ";
+    private static final String SQL_ORDER_BY_BTN_ORDER = " ORDER BY btn_order ASC ";
+    private static final String SQL_UPDATE_BTN_ORDER = " UPDATE extend_actionbar_action SET btn_order = ? WHERE id_action = ? ";
 
+    private static final String SQL_UPDATE_FILL_BLANK_IN_ORDER = " UPDATE extend_actionbar_action SET btn_order = btn_order - 1 WHERE btn_order > ? ";
     private static final String SQL_QUERY_GET_NEW_PRIMARY_KEY = " SELECT MAX(id_action) FROM extend_actionbar_action ";
 
     private static final String CONSTANT_CLOSE_PARENTHESIS = ")";
@@ -60,6 +65,7 @@ public class ActionButtonDAO implements IActionButtonDAO
         daoUtil.setString( 2, actionButton.getName( ) );
         daoUtil.setString( 3, actionButton.getHtmlContent( ) );
         daoUtil.setString( 4, actionButton.getResourceType( ) );
+        daoUtil.setInt( 5, getNewOrder( plugin ) );
         daoUtil.executeUpdate( );
         daoUtil.free( );
     }
@@ -81,6 +87,7 @@ public class ActionButtonDAO implements IActionButtonDAO
             action.setName( daoUtil.getString( 2 ) );
             action.setHtmlContent( daoUtil.getString( 3 ) );
             action.setResourceType( daoUtil.getString( 4 ) );
+            action.setOrder( daoUtil.getInt( 5 ) );
         }
 
         daoUtil.free( );
@@ -131,6 +138,7 @@ public class ActionButtonDAO implements IActionButtonDAO
             action.setName( daoUtil.getString( 2 ) );
             action.setHtmlContent( daoUtil.getString( 3 ) );
             action.setResourceType( daoUtil.getString( 4 ) );
+            action.setOrder( daoUtil.getInt( 5 ) );
             listActions.add( action );
         }
 
@@ -156,6 +164,7 @@ public class ActionButtonDAO implements IActionButtonDAO
             action.setName( daoUtil.getString( 2 ) );
             action.setHtmlContent( daoUtil.getString( 3 ) );
             action.setResourceType( daoUtil.getString( 4 ) );
+            action.setOrder( daoUtil.getInt( 5 ) );
             listActions.add( action );
         }
 
@@ -181,6 +190,7 @@ public class ActionButtonDAO implements IActionButtonDAO
             action.setName( daoUtil.getString( 2 ) );
             action.setHtmlContent( daoUtil.getString( 3 ) );
             action.setResourceType( daoUtil.getString( 4 ) );
+            action.setOrder( daoUtil.getInt( 5 ) );
         }
 
         daoUtil.free( );
@@ -207,6 +217,7 @@ public class ActionButtonDAO implements IActionButtonDAO
                 }
             }
             sbSql.append( CONSTANT_CLOSE_PARENTHESIS );
+            sbSql.append( SQL_ORDER_BY_BTN_ORDER );
             DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), plugin );
             int nIndex = 1;
             for ( Integer nIdAction : listIdActions )
@@ -221,11 +232,84 @@ public class ActionButtonDAO implements IActionButtonDAO
                 action.setName( daoUtil.getString( 2 ) );
                 action.setHtmlContent( daoUtil.getString( 3 ) );
                 action.setResourceType( daoUtil.getString( 4 ) );
+                action.setOrder( daoUtil.getInt( 5 ) );
                 listActions.add( action );
             }
 
             daoUtil.free( );
         }
         return listActions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getNewOrder( Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_ORDER );
+        daoUtil.executeQuery( );
+        int nResult = 1;
+        if ( daoUtil.next( ) )
+        {
+            nResult = daoUtil.getInt( 1 );
+            if ( nResult == 0 )
+            {
+                nResult++;
+            }
+        }
+        daoUtil.free( );
+        return nResult;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void updateActionButtonOrder( int nIdAction, int nNewOrder, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_UPDATE_BTN_ORDER, plugin );
+        daoUtil.setInt( 1, nNewOrder );
+        daoUtil.setInt( 2, nIdAction );
+        daoUtil.executeUpdate( );
+        daoUtil.free( );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<ActionButton> findByOrder( int nNewOrder, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ORDER, plugin );
+        daoUtil.setInt( 1, nNewOrder );
+        daoUtil.executeQuery( );
+        List<ActionButton> listAction = new ArrayList<ActionButton>( );
+        if ( daoUtil.next( ) )
+        {
+            ActionButton action = new ActionButton( );
+            action.setIdAction( daoUtil.getInt( 1 ) );
+            action.setName( daoUtil.getString( 2 ) );
+            action.setHtmlContent( daoUtil.getString( 3 ) );
+            action.setResourceType( daoUtil.getString( 4 ) );
+            action.setOrder( daoUtil.getInt( 5 ) );
+            listAction.add( action );
+        }
+
+        daoUtil.free( );
+
+        return listAction;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void fillBlankInOrder( int nOrder, Plugin plugin )
+    {
+        DAOUtil daoUtil = new DAOUtil( SQL_UPDATE_FILL_BLANK_IN_ORDER, plugin );
+        daoUtil.setInt( 1, nOrder );
+        daoUtil.executeUpdate( );
+        daoUtil.free( );
     }
 }

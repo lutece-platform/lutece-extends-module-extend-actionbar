@@ -19,6 +19,7 @@ public class ActionButton
     private String _strName;
     private String _strHtmlContent;
     private String _strResourceType;
+    private int _nOrder;
 
     /**
      * Get the id of the action button
@@ -91,6 +92,24 @@ public class ActionButton
     public void setResourceType( String strResourceType )
     {
         this._strResourceType = strResourceType;
+    }
+
+    /**
+     * Get the order of the action button
+     * @return The order of the action button
+     */
+    public int getOrder( )
+    {
+        return _nOrder;
+    }
+
+    /**
+     * Set the order of the action button
+     * @param nOrder The order of the action button
+     */
+    public void setOrder( int nOrder )
+    {
+        this._nOrder = nOrder;
     }
 
 }

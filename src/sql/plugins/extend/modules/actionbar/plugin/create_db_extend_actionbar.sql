@@ -4,6 +4,7 @@ CREATE TABLE extend_actionbar_action (
 	name VARCHAR(255) DEFAULT '' NOT NULL,
 	html_content LONG VARCHAR NULL,
 	resource_type VARCHAR(255) NOT NULL,
+	btn_order INT NOT NULL,
 	PRIMARY KEY (id_action)
 );
 

@@ -72,4 +72,36 @@ public interface IActionButtonDAO
      *         is null or empty, or if no action buttons was found
      */
     List<ActionButton> findActionButtons( List<Integer> listIdActions, Plugin plugin );
+
+    /**
+     * Get the next available order
+     * @param plugin The plugin
+     * @return The next available order
+     */
+    int getNewOrder( Plugin plugin );
+
+    /**
+     * Update the order of an action button
+     * @param nIdAction The id of the action to update the order of
+     * @param nNewOrder The new order of the action button
+     * @param plugin The plugin
+     */
+    void updateActionButtonOrder( int nIdAction, int nNewOrder, Plugin plugin );
+
+    /**
+     * Find action buttons by order. Only one action button should have a given
+     * order
+     * @param nNewOrder The new order
+     * @param plugin The plugin
+     * @return The list of action buttons with the given order
+     */
+    List<ActionButton> findByOrder( int nNewOrder, Plugin plugin );
+
+    /**
+     * Fill a blank in the order of action buttons. This method should be called
+     * after the removal of an action button
+     * @param order The id of the missing order
+     * @param plugin The plugin
+     */
+    void fillBlankInOrder( int order, Plugin plugin );
 }

@@ -19,6 +19,16 @@
 		<a class="btn btn-primary btn-small" href="jsp/admin/plugins/extend/modules/actionbar/GetModifyActionButton.jsp?id_action=${item.idAction}" title="#i18n{module.extend.actionbar.manage_action_buttons.modifyActionButton}">
 			<i class="icon-edit icon-white"></i>
 		</a>
+		<#if 1 < item.order>
+			<a class="btn btn-primary btn-small" href="jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=true" title="#i18n{module.extend.actionbar.manage_action_buttons.moveUp}">
+				<i class="icon-chevron-up icon-white"></i>
+			</a>
+		</#if>
+		<#if item.order < last_order>
+			<a class="btn btn-primary btn-small" href="jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=false" title="#i18n{module.extend.actionbar.manage_action_buttons.moveDown}">
+				<i class="icon-chevron-down icon-white"></i>
+			</a>
+		</#if>
 	</#if>
 	<#if permissions.REMOVE_ACTION_BUTTON?? && permissions.REMOVE_ACTION_BUTTON>
 		<a class="btn btn-danger btn-small" href="jsp/admin/plugins/extend/modules/actionbar/ConfirmRemoveActionButton.jsp?id_action=${item.idAction}" title="#i18n{module.extend.actionbar.manage_action_buttons.removeActionButton}">
