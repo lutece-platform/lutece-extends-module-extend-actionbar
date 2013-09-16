@@ -2,7 +2,7 @@
 
     <!-- Plugin Informations -->
     <name>extend-actionbar</name>
-    <class>fr.paris.lutece.plugins.extend.modules.comment.service.CommentPlugin</class>
+    <class>fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarPlugin</class>
     <version>1.0.0</version>
     <description>module.extend.actionbar.module.description</description>
     <provider>module.extend.actionbar.module.provider</provider>
