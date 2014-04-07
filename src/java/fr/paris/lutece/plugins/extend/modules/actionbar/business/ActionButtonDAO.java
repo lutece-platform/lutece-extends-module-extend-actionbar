@@ -33,11 +33,11 @@
  */
 package fr.paris.lutece.plugins.extend.modules.actionbar.business;
 
-import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.util.sql.DAOUtil;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import fr.paris.lutece.portal.service.plugin.Plugin;
+import fr.paris.lutece.util.sql.DAOUtil;
 
 
 /**
@@ -280,7 +280,7 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public int getNewOrder( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_ORDER );
+        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_ORDER, plugin );
         daoUtil.executeQuery( );
         int nResult = 1;
         if ( daoUtil.next( ) )
