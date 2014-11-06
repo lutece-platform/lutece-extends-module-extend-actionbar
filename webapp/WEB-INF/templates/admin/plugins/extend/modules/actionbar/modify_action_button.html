@@ -1,44 +1,50 @@
-<div class="row-fluid">
-	<form class="form-horizontal" method="post" action="jsp/admin/plugins/extend/modules/actionbar/DoModifyActionButton.jsp">
-		<fieldset>
-			<legend>#i18n{module.extend.actionbar.modify_action_button.pageTitle}</legend>
-			<div class="control-group">
-				<label class="control-label" for="name"> #i18n{module.extend.actionbar.add_action_button.labelName} * : </label>
-				<div class="controls">
-					<input type="text" name="name" value="${action_button.name!}" size="100" />
-				</div>
+<div class="row">
+	<div class="col-xs-12 col-sm-12 col-md-12">
+		<div class="box box-primary">
+			<div class="box-header">
+				<h3 class="box-title">#i18n{module.extend.actionbar.modify_action_button.pageTitle}</h3>
 			</div>
-			<div class="control-group">
-				<label class="control-label" for="name"> #i18n{module.extend.actionbar.add_action_button.labelResourceType} * : </label>
-				<div class="controls">
-					<@comboWithParams name="resourceType" additionalParameters="class='input-medium'" default_value=action_button.resourceType items=resourceTypes />
-					<span class="help-block">
-						#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}
-					</span>
-				</div>
+			<div class="box-body">
+				<form class="form-horizontal" method="post" action="jsp/admin/plugins/extend/modules/actionbar/DoModifyActionButton.jsp">
+					<input type="hidden" name="id_action" name="id_action" value="${action_button.idAction!}">
+					<div class="control-group">
+						<label class="control-label" for="name"> #i18n{module.extend.actionbar.add_action_button.labelName} *</label>
+						<div class="controls">
+							<input type="text" name="name" value="${action_button.name!}" size="100" />
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="name"> #i18n{module.extend.actionbar.add_action_button.labelResourceType} *</label>
+						<div class="controls">
+							<@comboWithParams name="resourceType" additionalParameters="class='input-medium'" default_value=action_button.resourceType items=resourceTypes />
+							<span class="help-block">
+								#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}
+							</span>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="html_content"> #i18n{module.extend.actionbar.add_action_button.labelHtmlContent}</label>
+						<div class="controls">
+							<textarea rows="10" cols="100" id="html_content" name="html_content" >${action_button.htmlContent!}</textarea>
+							<span class="help-block">
+								#i18n{module.extend.actionbar.add_action_button.labelContentHelp} :
+								<ul>
+									<li>${r"@id_resource"} : #i18n{module.extend.actionbar.add_action_button.labelIdResource}</li>
+									<li>${r"@type_resource"} : #i18n{module.extend.actionbar.add_action_button.labelResourceType}</li>
+								</ul>
+							</span>
+						</div>
+					</div>
+					<div class="form-actions">
+						<button class="btn btn-primary btn-small" name="modify" value="#i18n{portal.util.labelModify}" id="modify" title="#i18n{portal.util.labelModify}">
+							<i class="icon-edit icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelModify}
+						</button>
+						<button class="btn btn-small" name="cancel" id="cancel" value="#i18n{portal.util.labelBack}" title="#i18n{portal.util.labelBack}">
+							<i class="icon-remove-circle"></i>&nbsp;#i18n{portal.util.labelBack}
+						</button>
+					</div>
+				</form>
 			</div>
-			<div class="control-group">
-				<label class="control-label" for="html_content"> #i18n{module.extend.actionbar.add_action_button.labelHtmlContent} : </label>
-				<div class="controls">
-					<textarea rows="10" cols="100" id="html_content" name="html_content" >${action_button.htmlContent!}</textarea>
-					<span class="help-block">
-              	 		#i18n{module.extend.actionbar.add_action_button.labelContentHelp} :
-                		<ul>
-                			<li>${r"@id_resource"} : #i18n{module.extend.actionbar.add_action_button.labelIdResource}</li>
-                			<li>${r"@type_resource"} : #i18n{module.extend.actionbar.add_action_button.labelResourceType}</li>
-                		</ul>
-					</span>
-				</div>
-			</div>
-			<div class="form-actions">
-				<input type="hidden" name="id_action" name="id_action" value="${action_button.idAction!}" />
-				<button class="btn btn-primary btn-small" name="modify" value="#i18n{portal.util.labelModify}" id="modify" title="#i18n{portal.util.labelModify}">
-					<i class="icon-edit icon-white">&nbsp;</i>&nbsp;#i18n{portal.util.labelModify}
-				</button>
-				<button class="btn btn-small" name="cancel" id="cancel" value="#i18n{portal.util.labelBack}" title="#i18n{portal.util.labelBack}">
-					<i class="icon-remove-circle"></i>&nbsp;#i18n{portal.util.labelBack}
-				</button>
-			</div>
-		</fieldset>
-	</form>
+		</div>
+	</div>
 </div>
