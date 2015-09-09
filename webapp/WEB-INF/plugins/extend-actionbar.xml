@@ -3,7 +3,7 @@
     <!-- Plugin Informations -->
     <name>extend-actionbar</name>
     <class>fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarPlugin</class>
-    <version>1.1.1</version>
+    <version>1.1.2-SNAPSHOT</version>
     <description>module.extend.actionbar.module.description</description>
     <provider>module.extend.actionbar.module.provider</provider>
     <documentation/>
