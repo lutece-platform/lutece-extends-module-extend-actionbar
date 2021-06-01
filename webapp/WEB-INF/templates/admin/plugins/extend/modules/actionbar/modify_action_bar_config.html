@@ -1,55 +1,37 @@
-<div class="form-group">
-	<label class="control-label col-xs-12 col-sm-3 col-md-3" for="name">#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}</label>
-	<div class="col-xs-12 col-sm-8 col-md-8">
-		<div class="checkbox">
-			<label>
-				<input type="checkbox" name="all_buttons" id="all_buttons" value="true" <#if config.allButtons?? && config.allButtons>checked</#if>>
-				#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}
-			</label>
-		</div>
-	</div>
-</div>
+<@formGroup rows=2 labelFor='name' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}' >
+	<#assign cbxCheck><#if config.allButtons?? && config.allButtons>true<#else>false</#if></#assign>
+	<@checkBox name='all_buttons' id='all_buttons' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}' value='true' checked=cbxCheck?boolean />
+</@formGroup>
 <#if action_buttons?? && 0 < action_buttons?size>
-	<div class="form-group">
-		<label class="control-label col-xs-12 col-sm-3 col-md-3" for="html_content">#i18n{module.extend.actionbar.modify_action_bar_config.labelActionButtons}</label>
-		<div class="col-xs-12 col-sm-8 col-md-8">
-			<#list action_buttons as actionButton>
-				<div class="checkbox">
-					<label>
-						<#assign associated = false>
-						<#if config.listActionButtonId?? && 0 < config.listActionButtonId?size >
-							<#list config.listActionButtonId as actionButtonsId>
-								<#if actionButtonsId == actionButton.idAction>
-									<#assign associated = true>
-								</#if>
-							</#list>
-						</#if>
-						<input name="action_button" class="action_buttons" type="checkbox" value="${actionButton.idAction}" <#if associated>checked="checked"</#if> >
-						${actionButton.name}
-					</label>
-				</div>
+	<@formGroup rows=2 labelFor='html_content' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelActionButtons}'>
+		<#list action_buttons as actionButton>
+		<#assign associated = false?c>
+		<#if config.listActionButtonId?? && 0 < config.listActionButtonId?size >
+			<#list config.listActionButtonId as actionButtonsId>
+				<#if actionButtonsId == actionButton.idAction>
+					<#assign associated = true?c>
+				</#if>
 			</#list>
-		</div>
-	</div>
+		</#if>
+		<@checkBox name='action_button' id='action_button_${actionButton.idAction}' labelFor='action_button_${actionButton.idAction}' labelKey=actionButton.name value=actionButton.idAction?string checked=associated?boolean />
+		</#list>
+	</@formGroup>
 </#if>
+
 <script>
-$(document).ready( function(){
-	$("#all_buttons").click( function(e){
-		if( $(this).prop("checked") ){
-			$(".action_buttons").prop( "checked", "");
-			$(this).prop( "checked", "checked");
+$( function(){
+	$('#all_buttons').click( function(e){
+		if( $(this).prop( 'checked' ) ){
+			$( '[name="action_button"]' ).prop( 'checked', '' );
 		} else {
-			$(this).prop( "checked", "");
-			$(".action_buttons").prop( "checked", "checked");
+			$( '[name="action_button"]' ).prop( 'checked', 'checked' );;
 		}
 	});
 	
-	$(".action_buttons").click( function(e){
-		$("#all_buttons").prop( "checked", "");
-		if ( $(".action_buttons:checked").length==0 ){
-			$("#all_buttons").prop( "checked", "checked");
-		} 
+	$( '[name="action_button"]' ).click( function(e){
+		$("#all_buttons").prop( 'checked', '' );
+		
 	});
 });
-
 </script>
+<@extendScript />
