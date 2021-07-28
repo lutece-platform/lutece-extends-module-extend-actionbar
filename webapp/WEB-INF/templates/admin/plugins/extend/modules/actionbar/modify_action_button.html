@@ -1,14 +1,14 @@
 <@extendBox extendTitle='#i18n{module.extend.actionbar.modify_action_button.pageTitle}'>
 <@tform type='form' action='jsp/admin/plugins/extend/modules/actionbar/DoModifyActionButton.jsp'>
-	<input type="hidden" id="id_action" name="id_action" value="${action_button.idAction!}">
-	<@formGroup rows=2 labelKey='#i18n{module.extend.actionbar.add_action_button.labelName}' labelFor='name' mandatory=true>
+	<@input type='hidden' id='id_action' name='id_action' value='${action_button.idAction!}' />
+	<@formGroup labelFor='name' labelKey='#i18n{module.extend.actionbar.add_action_button.labelName}' mandatory=true>
 		<@input name='name' value='${action_button.name!}' />
 	</@formGroup>
-	<@formGroup rows=2 labelKey='#i18n{module.extend.actionbar.add_action_button.labelResourceType}' labelFor='resourceType' helpKey='#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}' mandatory=true>
+	<@formGroup labelFor='resourceType' labelKey='#i18n{module.extend.actionbar.add_action_button.labelResourceType}' helpKey='#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}' mandatory=true>
 		<@select name='resourceType' class='form-control' default_value='' items=resourceTypes />
 	</@formGroup>
 	<@row>
-		<@columns sm=7>
+		<@columns sm=6>
 			<#assign helpText>
 			#i18n{module.extend.actionbar.add_action_button.labelContentHelp}
 			<@ul>
@@ -16,14 +16,14 @@
 				<@li>${r"@type_resource"} : #i18n{module.extend.actionbar.add_action_button.labelResourceType}</@li>
 			</@ul>
 			</#assign>
-			<@formGroup rows=2 labelKey='#i18n{module.extend.actionbar.add_action_button.labelHtmlContent}' labelFor='html_content' helpKey=helpText>
+			<@formGroup labelFor='html_content' labelKey='#i18n{module.extend.actionbar.add_action_button.labelHtmlContent}' helpKey=helpText rows=2>
 				<@input type='textarea' rows=10 id='html_content' name='html_content'>${action_button.htmlContent!?html}</@input>
 			</@formGroup>
 		</@columns>
-		<@columns sm=5>
+		<@columns sm=6>
 			<h5>Exemple de code</h5>	
 			<code class="copy-content">
-				<pre >&lt;a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"&gt;&lt;i class="fas fa-check"&gt;&lt;/i&gt; Retour&lt;/a&gt;</pre>
+				<pre>&lt;a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"&gt;&lt;i class="fas fa-check"&gt;&lt;/i&gt; Retour&lt;/a&gt;</pre>
 			</code>
 			<@copyElementToClipboard selector='.copy-content' class='"copy-icon"' />
 			<h5>Exemple du code ci-dessus</h5>
@@ -31,8 +31,8 @@
 		</@columns>
 	</@row>
 	<@formGroup>
-		<@button type='submit' color='primary' style=' ' name='modify' value='#i18n{portal.util.labelModify}' id='modify' title='#i18n{portal.util.labelModify}' buttonIcon='edit' />
-		<@button type='submit' color='default' style=' ' name='cancel' value='#i18n{portal.util.labelBack}' id='cancel' title='#i18n{portal.util.labelBack}' buttonIcon='times' />
+		<@button type='submit' name='modify' value='#i18n{portal.util.labelModify}' id='modify' title='#i18n{portal.util.labelModify}' buttonIcon='edit' />
+		<@button type='submit' name='cancel' value='#i18n{portal.util.labelBack}' id='cancel' title='#i18n{portal.util.labelBack}' buttonIcon='times' color='default' />
 	</@formGroup>
 </@tform>
 </@extendBox>

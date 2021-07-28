@@ -1,9 +1,9 @@
-<@formGroup rows=2 labelFor='name' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}' >
+<@formGroup labelFor='name' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}' rows=2>
 	<#assign cbxCheck><#if config.allButtons?? && config.allButtons>true<#else>false</#if></#assign>
-	<@checkBox name='all_buttons' id='all_buttons' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}' value='true' checked=cbxCheck?boolean />
+	<@checkBox name='all_buttons' id='all_buttons' labelFor='all_buttons' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelAllActionButtons}' value='true' checked=cbxCheck?boolean />
 </@formGroup>
 <#if action_buttons?? && 0 < action_buttons?size>
-	<@formGroup rows=2 labelFor='html_content' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelActionButtons}'>
+	<@formGroup labelFor='html_content' labelKey='#i18n{module.extend.actionbar.modify_action_bar_config.labelActionButtons}' rows=2>
 		<#list action_buttons as actionButton>
 		<#assign associated = false?c>
 		<#if config.listActionButtonId?? && 0 < config.listActionButtonId?size >

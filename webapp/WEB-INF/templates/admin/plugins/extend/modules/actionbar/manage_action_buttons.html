@@ -1,33 +1,24 @@
 <#assign btnTools>
-<#if permissions.ADD_ACTION_BUTTON?? && permissions.ADD_ACTION_BUTTON>
-<@cLink href='jsp/admin/plugins/extend/modules/actionbar/GetAddActionButton.jsp' label='#i18n{module.extend.actionbar.manage_action_buttons.addActionButton}' class='btn btn-primary'  >
-	<@icon style='plus' title='#i18n{module.extend.actionbar.manage_action_buttons.addActionButton}' />
-</@cLink>
-</#if>
+	<#if permissions.ADD_ACTION_BUTTON?? && permissions.ADD_ACTION_BUTTON>
+		<@aButton href='jsp/admin/plugins/extend/modules/actionbar/GetAddActionButton.jsp' title='#i18n{module.extend.actionbar.manage_action_buttons.addActionButton}' hideTitle=['xs','sm'] buttonIcon='plus' size='sm' />
+	</#if>
 </#assign>
+
 <@extendBox extendTitle='#i18n{module.extend.actionbar.manage_action_buttons.pageTitle}' hasBoxTools=true extendBoxTools=btnTools>
 	<@dataTable dataTableManager=dataTableManager actionMacro="getActionsActionButton" />
 </@extendBox>
 
-<#macro getActionsActionButton item >
+<#macro getActionsActionButton item>
 	<#if permissions.MODIFY_ACTION_BUTTON?? && permissions.MODIFY_ACTION_BUTTON>
-		<@cLink href='jsp/admin/plugins/extend/modules/actionbar/GetModifyActionButton.jsp?id_action=${item.idAction}' label='' title='#i18n{module.extend.actionbar.manage_action_buttons.modifyActionButton}' class='btn btn-primary' >
-			<@icon style='edit' />
-		</@cLink>
+		<@aButton href='jsp/admin/plugins/extend/modules/actionbar/GetModifyActionButton.jsp?id_action=${item.idAction}' title='#i18n{module.extend.actionbar.manage_action_buttons.modifyActionButton}' hideTitle=['all'] buttonIcon='edit' size='sm' />
 		<#if 1 < item.order>
-			<@cLink href='jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=true' label='' title='#i18n{module.extend.actionbar.manage_action_buttons.moveUp}' class='btn btn-primary' >
-				<@icon style='arrow-up' />
-			</@cLink>
+			<@aButton href='jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=true' title='#i18n{module.extend.actionbar.manage_action_buttons.moveUp}' hideTitle=['all'] buttonIcon='arrow-up' size='sm' />
 		</#if>
 		<#if item.order < last_order>
-			<@cLink href='jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=false' label='' title='#i18n{module.extend.actionbar.manage_action_buttons.moveDown}' class='btn btn-primary' >
-				<@icon style='arrow-down' />
-			</@cLink>
+			<@aButton href='jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=false' title='#i18n{module.extend.actionbar.manage_action_buttons.moveDown}' hideTitle=['all'] buttonIcon='arrow-down' size='sm' />
 		</#if>
 	</#if>
 	<#if permissions.REMOVE_ACTION_BUTTON?? && permissions.REMOVE_ACTION_BUTTON>
-		<@cLink href='jsp/admin/plugins/extend/modules/actionbar/ConfirmRemoveActionButton.jsp?id_action=${item.idAction}' label='' title='#i18n{module.extend.actionbar.manage_action_buttons.removeActionButton}' class='btn btn-danger' >
-			<@icon style='trash' />
-		</@cLink>
+		<@aButton href='jsp/admin/plugins/extend/modules/actionbar/ConfirmRemoveActionButton.jsp?id_action=${item.idAction}' title='#i18n{module.extend.actionbar.manage_action_buttons.removeActionButton}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
 	</#if>
 </#macro>
