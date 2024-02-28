@@ -1,41 +1,37 @@
 <@extendBox extendTitle='#i18n{module.extend.actionbar.add_action_button.pageTitle}'>
-<@row>
-	<@columns>
-		<@tform action='jsp/admin/plugins/extend/modules/actionbar/DoAddActionButton.jsp'>
-			<@formGroup labelFor='name' labelKey='#i18n{module.extend.actionbar.add_action_button.labelName}' mandatory=true>
-				<@input name='name' />
-			</@formGroup>
-			<@formGroup labelFor='resourceType' labelKey='#i18n{module.extend.actionbar.add_action_button.labelResourceType}' helpKey='#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}' mandatory=true>
-				<@select name='resourceType' class='form-control' default_value='' items=resourceTypes />
-			</@formGroup>
-			<@row>
-				<@columns sm=6>
-					<#assign helpText>
-					#i18n{module.extend.actionbar.add_action_button.labelContentHelp}
-					<@ul>
-						<@li>${r"@id_resource"} : #i18n{module.extend.actionbar.add_action_button.labelIdResource}</@li>
-						<@li>${r"@type_resource"} : #i18n{module.extend.actionbar.add_action_button.labelResourceType}</@li>
-					</@ul>
-					</#assign>
-					<@formGroup rows=2 labelKey='#i18n{module.extend.actionbar.add_action_button.labelHtmlContent}' labelFor='html_content' helpKey=helpText>
-						<@input type='textarea' rows=10 id='html_content' name='html_content' />
-					</@formGroup>
-				</@columns>
-				<@columns sm=6>
-					<h5>Exemple de code</h5>	
-					<code class="copy-content">
-						<pre>&lt;a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"&gt;&lt;i class="fas fa-check"&gt;&lt;/i&gt; Retour&lt;/a&gt;</pre>
-					</code>
-					<@copyElementToClipboard selector='.copy-content' class='"copy-icon"' />
-					<h5>Exemple du code ci-dessus</h5>
-					<pre><a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"><i class="fa fa-times-circle"></i> Retour</a></pre>	
-				</@columns>
-			</@row>
-			<@formGroup>
-				<@button type='submit' name='create' value='#i18n{portal.util.labelCreate}' id='create' title='#i18n{portal.util.labelCreate}' buttonIcon='plus' />
-				<@button type='submit' name='cancel' value='#i18n{portal.util.labelBack}' id='cancel' title='#i18n{portal.util.labelBack}' buttonIcon='times' color='default' />
-			</@formGroup>
-		</@tform>
-	</@columns>
-</@row>
+	<@tform action='jsp/admin/plugins/extend/modules/actionbar/DoAddActionButton.jsp' boxed=true>
+		<@formGroup labelFor='name' labelKey='#i18n{module.extend.actionbar.add_action_button.labelName}' mandatory=true>
+			<@input name='name' />
+		</@formGroup>
+		<@formGroup labelFor='resourceType' labelKey='#i18n{module.extend.actionbar.add_action_button.labelResourceType}' helpKey='#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}' mandatory=true>
+			<@select name='resourceType' class='form-control' default_value='' items=resourceTypes />
+		</@formGroup>
+		<@row>
+			<@columns sm=6>
+				<#assign helpText>
+				#i18n{module.extend.actionbar.add_action_button.labelContentHelp}
+				<@ul>
+					<@li>${r"@id_resource"} : #i18n{module.extend.actionbar.add_action_button.labelIdResource}</@li>
+					<@li>${r"@type_resource"} : #i18n{module.extend.actionbar.add_action_button.labelResourceType}</@li>
+				</@ul>
+				</#assign>
+				<@formGroup rows=2 labelKey='#i18n{module.extend.actionbar.add_action_button.labelHtmlContent}' labelFor='html_content' helpKey=helpText>
+					<@input type='textarea' rows=10 id='html_content' name='html_content' />
+				</@formGroup>
+			</@columns>
+			<@columns sm=6>
+				<h5>Exemple de code</h5>	
+				<code class="copy-content">
+					<pre>&lt;a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"&gt;&lt;i class="fas fa-check"&gt;&lt;/i&gt; Retour&lt;/a&gt;</pre>
+				</code>
+				<@copyElementToClipboard selector='.copy-content' class='"copy-icon"' />
+				<h5>Exemple du code ci-dessus</h5>
+				<pre><a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"><i class="fa fa-times-circle"></i> Retour</a></pre>	
+			</@columns>
+		</@row>
+		<@formGroup>
+			<@button type='submit' name='create' value='#i18n{portal.util.labelCreate}' id='create' title='#i18n{portal.util.labelCreate}' buttonIcon='device-floppy' />
+			<@button type='submit' name='cancel' value='#i18n{portal.util.labelBack}' id='cancel' title='#i18n{portal.util.labelBack}' buttonIcon='times' color='default' cancel=true />
+		</@formGroup>
+	</@tform>
 </@extendBox>

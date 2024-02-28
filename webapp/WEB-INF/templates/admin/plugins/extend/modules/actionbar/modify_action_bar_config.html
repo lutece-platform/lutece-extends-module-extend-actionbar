@@ -19,19 +19,28 @@
 </#if>
 
 <script>
-$( function(){
-	$('#all_buttons').click( function(e){
-		if( $(this).prop( 'checked' ) ){
-			$( '[name="action_button"]' ).prop( 'checked', '' );
-		} else {
-			$( '[name="action_button"]' ).prop( 'checked', 'checked' );;
-		}
-	});
+	document.addEventListener('DOMContentLoaded', function() {
+		var allButtons = document.getElementById('all_buttons');
+		var actionButtons = document.querySelectorAll('[name="action_button"]');
 	
-	$( '[name="action_button"]' ).click( function(e){
-		$("#all_buttons").prop( 'checked', '' );
-		
+		allButtons.addEventListener('click', function() {
+			if (allButtons.checked) {
+				actionButtons.forEach(function(button) {
+					button.checked = false;
+				});
+			} else {
+				actionButtons.forEach(function(button) {
+					button.checked = true;
+				});
+			}
+		});
+	
+		actionButtons.forEach(function(button) {
+			button.addEventListener('click', function() {
+				allButtons.checked = false;
+			});
+		});
 	});
-});
-</script>
+	</script>
+	
 <@extendScript />
