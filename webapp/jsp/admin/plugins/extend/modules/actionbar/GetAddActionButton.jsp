@@ -1,23 +1,13 @@
-<%@page import="fr.paris.lutece.portal.web.pluginaction.IPluginActionResult"%>
+<%@ page errorPage="../../../../ErrorPage.jsp" %>
+<jsp:include page="../../../../AdminHeader.jsp" />
 
-<jsp:useBean id="actionbarJspBean" scope="session" class="fr.paris.lutece.plugins.extend.modules.actionbar.web.ActionbarJspBean" />
+<%@page import="fr.paris.lutece.plugins.extend.modules.actionbar.web.ActionbarJspBean"%>
 
-<% 
-	actionbarJspBean.init( request, actionbarJspBean.MANAGE_ACTION_BUTTONS );
-	IPluginActionResult result = actionbarJspBean.getAddActionButton( request );
-	if ( result.getRedirect(  ) != null )
-	{
-		response.sendRedirect( result.getRedirect(  ) );
-	}
-	else if ( result.getHtmlContent(  ) != null )
-	{
-%>
-		<%@ page errorPage="../../../../ErrorPage.jsp" %>
-		<jsp:include page="../../../../AdminHeader.jsp" />
+${ actionbarJspBean.init( pageContext.request, ActionbarJspBean.MANAGE_ACTION_BUTTONS ) }
 
-		<%= result.getHtmlContent(  ) %>
+${ pageContext.setAttribute( 'pluginActionResult', actionbarJspBean.getAddActionButton( pageContext.request ) ) }
+${ not empty pageContext.getAttribute( 'pluginActionResult' ).redirect ? pageContext.response.sendRedirect( pageContext.getAttribute( 'pluginActionResult' ).redirect ) : '' }
 
-		<%@ include file="../../../../AdminFooter.jsp" %>
-<%
-	}
-%>
+${ not empty pageContext.getAttribute( 'pluginActionResult' ).htmlContent ? pageContext.getAttribute( 'pluginActionResult' ).htmlContent : '' }
+
+<%@ include file="../../../../AdminFooter.jsp" %>

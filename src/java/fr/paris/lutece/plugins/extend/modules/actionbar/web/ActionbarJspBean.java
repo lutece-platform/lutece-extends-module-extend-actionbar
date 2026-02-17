@@ -36,7 +36,6 @@ package fr.paris.lutece.plugins.extend.modules.actionbar.web;
 import fr.paris.lutece.plugins.extend.modules.actionbar.business.ActionButton;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarResourceIdService;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarService;
-import fr.paris.lutece.plugins.extend.service.type.ExtendableResourceTypeService;
 import fr.paris.lutece.plugins.extend.service.type.IExtendableResourceTypeService;
 import fr.paris.lutece.portal.business.user.AdminUser;
 import fr.paris.lutece.portal.service.admin.AdminUserService;
@@ -44,7 +43,6 @@ import fr.paris.lutece.portal.service.i18n.I18nService;
 import fr.paris.lutece.portal.service.message.AdminMessage;
 import fr.paris.lutece.portal.service.message.AdminMessageService;
 import fr.paris.lutece.portal.service.rbac.RBACService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
 import fr.paris.lutece.portal.service.template.AppTemplateService;
 import fr.paris.lutece.portal.service.util.AppPathService;
 import fr.paris.lutece.portal.service.util.AppPropertiesService;
@@ -61,8 +59,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -70,6 +70,8 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * JspBean of ActionBar plugin.
  */
+@SessionScoped
+@Named
 public class ActionbarJspBean extends AdminFeaturesPageJspBean
 {
     /**
@@ -130,9 +132,9 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
 
     // local variables
     @Inject
-    private ActionbarService _actionbarService = SpringContextService.getBean( ActionbarService.BEAN_NAME );
-    private IExtendableResourceTypeService _resourceTypeService = SpringContextService
-            .getBean( ExtendableResourceTypeService.BEAN_SERVICE );
+    private ActionbarService _actionbarService;
+    @Inject
+    private IExtendableResourceTypeService _resourceTypeService;
     private DataTableManager<ActionButton> _dataTableManager;
 
     /**

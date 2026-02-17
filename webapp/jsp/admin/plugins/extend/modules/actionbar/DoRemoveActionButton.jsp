@@ -1,6 +1,6 @@
 <%@ page errorPage="../../../../ErrorPage.jsp" %>
-<jsp:useBean id="actionbarJspBean" scope="session" class="fr.paris.lutece.plugins.extend.modules.actionbar.web.ActionbarJspBean" />
-<% 
-	actionbarJspBean.init( request, actionbarJspBean.MANAGE_ACTION_BUTTONS );
-	response.sendRedirect( actionbarJspBean.doRemoveActionButton( request ) );
-%>
+
+<%@page import="fr.paris.lutece.plugins.extend.modules.actionbar.web.ActionbarJspBean"%>
+
+${ actionbarJspBean.init( pageContext.request, ActionbarJspBean.MANAGE_ACTION_BUTTONS ) }
+${ pageContext.response.sendRedirect( actionbarJspBean.doRemoveActionButton( pageContext.request )) }

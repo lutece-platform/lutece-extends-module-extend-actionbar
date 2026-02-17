@@ -35,24 +35,29 @@ package fr.paris.lutece.plugins.extend.modules.actionbar.service.extender;
 
 import fr.paris.lutece.plugins.extend.business.extender.ResourceExtenderDTO;
 import fr.paris.lutece.plugins.extend.modules.actionbar.business.config.ActionbarExtenderConfig;
+import fr.paris.lutece.plugins.extend.modules.actionbar.web.component.ActionbarResourceExtenderComponent;
 import fr.paris.lutece.plugins.extend.service.extender.AbstractResourceExtender;
 import fr.paris.lutece.plugins.extend.service.extender.config.IResourceExtenderConfigService;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
 
 /**
- * 
+ *
  * Extender for action bar. <br />
  * Macro to use in the templates :
  * <strong>@Extender[idResource,resourceType,actionbar,{action:actionName|all}]@
  * </strong><br />
  * Examples : @Extender[22,document,actionbar,{action:all}]@
  */
+@ApplicationScoped
+@Named( "extend-actionbar.actionbarResourceExtender" )
 public class ActionbarResourceExtender extends AbstractResourceExtender
 {
 
@@ -62,6 +67,19 @@ public class ActionbarResourceExtender extends AbstractResourceExtender
     @Inject
     @Named( "extend-actionbar.actionbarExtenderConfigService" )
     private IResourceExtenderConfigService _configService;
+
+    @Inject
+    private ActionbarResourceExtenderComponent _resourceExtenderComponent;
+
+    @PostConstruct
+    public void init( )
+    {
+        setResourceExtenderComponent( _resourceExtenderComponent );
+        setKey( EXTENDER_TYPE );
+        setI18nTitleKey( "module.extend.actionbar.extender.actionbar.label" );
+        setConfigRequired( true );
+        setHistoryEnable( false );
+    }
 
     /**
      * {@inheritDoc}

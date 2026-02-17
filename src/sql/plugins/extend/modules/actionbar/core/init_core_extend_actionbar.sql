@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+-- changeset module-extend-actionbar:init_core_extend_actionbar.sql
+-- preconditions onFail:MARK_RAN onError:WARN
+
 --
 -- Init  table core_admin_right
 --
