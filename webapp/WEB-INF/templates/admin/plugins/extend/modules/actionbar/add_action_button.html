@@ -4,7 +4,7 @@
 			<@input name='name' />
 		</@formGroup>
 		<@formGroup labelFor='resourceType' labelKey='#i18n{module.extend.actionbar.add_action_button.labelResourceType}' helpKey='#i18n{module.extend.actionbar.add_action_button.labelResourceTypeHelp}' mandatory=true>
-			<@select name='resourceType' class='form-control' default_value='' items=resourceTypes />
+			<@select name='resourceType' default_value='' items=resourceTypes />
 		</@formGroup>
 		<@row>
 			<@columns sm=6>
@@ -22,11 +22,11 @@
 			<@columns sm=6>
 				<h5>Exemple de code</h5>	
 				<code class="copy-content">
-					<pre>&lt;a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"&gt;&lt;i class="fas fa-check"&gt;&lt;/i&gt; Retour&lt;/a&gt;</pre>
+					<pre>&lt;a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"&gt;&lt;i class="ti ti-check"&gt;&lt;/i&gt; Retour&lt;/a&gt;</pre>
 				</code>
 				<@copyElementToClipboard selector='.copy-content' class='"copy-icon"' />
 				<h5>Exemple du code ci-dessus</h5>
-				<pre><a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"><i class="fa fa-times-circle"></i> Retour</a></pre>	
+				<pre><a class="btn btn-primary" title="Retour" href="javascript:history.go(-1);"><i class="ti ti-x"></i> Retour</a></pre>	
 			</@columns>
 		</@row>
 		<@formGroup>

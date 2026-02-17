@@ -34,7 +34,8 @@
 package fr.paris.lutece.plugins.extend.modules.actionbar.business;
 
 import fr.paris.lutece.portal.service.plugin.Plugin;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
+
+import jakarta.enterprise.inject.spi.CDI;
 
 import java.util.List;
 
@@ -44,7 +45,7 @@ import java.util.List;
  */
 public final class ActionButtonHome
 {
-    private static IActionButtonDAO _dao = SpringContextService.getBean( "extend-actionbar.actionButtonDAO" );
+    private static IActionButtonDAO _dao = CDI.current( ).select( IActionButtonDAO.class ).get( );
 
     /**
      * Private constructor

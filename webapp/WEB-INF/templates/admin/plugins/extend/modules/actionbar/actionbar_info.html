@@ -1,0 +1,16 @@
+<#if config??>
+	<#if config.allButtons>
+		<p>#i18n{module.extend.actionbar.actionbar_info.labelAllButtons}</p>
+	<#else>
+		<p>#i18n{module.extend.actionbar.actionbar_info.labelSelectedButtons}</p>
+	</#if>
+	<#if action_buttons?? && 0 < action_buttons?size>
+		<ul>
+			<#list action_buttons as actionButton>
+				<li>${actionButton.name!}</li>
+			</#list>
+		</ul>
+	<#else>
+		<p><em>#i18n{module.extend.actionbar.actionbar_info.labelNoButtons}</em></p>
+	</#if>
+</#if>

@@ -39,6 +39,7 @@ import fr.paris.lutece.plugins.extend.modules.actionbar.business.ActionButton;
 import fr.paris.lutece.plugins.extend.modules.actionbar.business.config.ActionbarExtenderConfig;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarService;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.extender.ActionbarResourceExtender;
+import fr.paris.lutece.plugins.extend.service.extender.IResourceExtender;
 import fr.paris.lutece.plugins.extend.service.extender.config.IResourceExtenderConfigService;
 import fr.paris.lutece.plugins.extend.util.ExtendErrorException;
 import fr.paris.lutece.plugins.extend.web.component.AbstractResourceExtenderComponent;
@@ -51,23 +52,26 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
 
 /**
- * 
+ *
  * ActionbarResourceExtenderComponent
- * 
+ *
  */
+@ApplicationScoped
 public class ActionbarResourceExtenderComponent extends AbstractResourceExtenderComponent
 {
     // TEMPLATES
     private static final String TEMPLATE_MODIFY_ACTIONBAR_CONFIG = "admin/plugins/extend/modules/actionbar/modify_action_bar_config.html";
     private static final String TEMPLATE_ACTION_BAR = "skin/plugins/extend/modules/actionbar/action_bar.html";
+    private static final String TEMPLATE_ACTIONBAR_INFO = "admin/plugins/extend/modules/actionbar/actionbar_info.html";
 
     private static final String PARAMETER_ALL_ACTIONS = "all_buttons";
     private static final String PARAMETER_ACTION_BUTTON = "action_button";
@@ -84,6 +88,9 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
     private IResourceExtenderConfigService _configService;
     @Inject
     private ActionbarService _actionbarService;
+    @Inject
+    @Named( "extend-actionbar.actionbarResourceExtender" )
+    private IResourceExtender _resourceExtender;
 
     /**
      * {@inheritDoc}
@@ -105,6 +112,10 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
         // Method to get the html code of the extension in front office
         ActionbarExtenderConfig config = _configService.find( ActionbarResourceExtender.EXTENDER_TYPE,
                 strIdExtendableResource, strExtendableResourceType );
+        if ( config == null )
+        {
+            return StringUtils.EMPTY;
+        }
         List<ActionButton> listActionsButtons;
         if ( config.getAllButtons( ) )
         {
@@ -194,6 +205,33 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
     @Override
     public String getInfoHtml( ResourceExtenderDTO resourceExtender, Locale locale, HttpServletRequest request )
     {
-        return StringUtils.EMPTY;
+        ActionbarExtenderConfig config = _configService.find( resourceExtender.getIdExtender( ) );
+        if ( config == null )
+        {
+            return StringUtils.EMPTY;
+        }
+        List<ActionButton> listActionButtons;
+        if ( config.getAllButtons( ) )
+        {
+            listActionButtons = _actionbarService.findActionButtonsByResourceType( resourceExtender.getExtendableResourceType( ) );
+        }
+        else
+        {
+            listActionButtons = _actionbarService.findActionButtons( config.getListActionButtonId( ) );
+        }
+        Map<String, Object> model = new HashMap<String, Object>( );
+        model.put( MARK_RESOURCE_EXTENDER_CONFIG, config );
+        model.put( MARK_ACTION_BUTTONS, listActionButtons );
+        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ACTIONBAR_INFO, locale, model );
+        return template.getHtml( );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IResourceExtender getResourceExtender( )
+    {
+        return _resourceExtender;
     }
 }

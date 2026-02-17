@@ -1,3 +1,7 @@
+-- liquibase formatted sql
+-- changeset module-extend-actionbar:create_db_extend_actionbar.sql
+-- preconditions onFail:MARK_RAN onError:WARN
+
 DROP TABLE IF EXISTS extend_actionbar_action;
 CREATE TABLE extend_actionbar_action (
 	id_action INT NOT NULL,

@@ -39,10 +39,13 @@ import java.util.List;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
 
+import jakarta.enterprise.context.ApplicationScoped;
+
 
 /**
  * DAO to manage ActionButton
  */
+@ApplicationScoped
 public class ActionButtonDAO implements IActionButtonDAO
 {
     private static final String SQL_QUERY_SELECT = " SELECT id_action, name, html_content, resource_type, btn_order FROM extend_actionbar_action WHERE id_action = ? ";
@@ -73,17 +76,17 @@ public class ActionButtonDAO implements IActionButtonDAO
      */
     private int newPrimaryKey( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_PRIMARY_KEY, plugin );
-        daoUtil.executeQuery( );
-        int res = 1;
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_PRIMARY_KEY, plugin ) )
         {
-            res = daoUtil.getInt( 1 ) + 1;
+            daoUtil.executeQuery( );
+            int res = 1;
+            if ( daoUtil.next( ) )
+            {
+                res = daoUtil.getInt( 1 ) + 1;
+            }
+
+            return res;
         }
-
-        daoUtil.free( );
-
-        return res;
     }
 
     /**
@@ -92,15 +95,16 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public void create( ActionButton actionButton, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_INSERT, plugin );
-        actionButton.setIdAction( newPrimaryKey( plugin ) );
-        daoUtil.setInt( 1, actionButton.getIdAction( ) );
-        daoUtil.setString( 2, actionButton.getName( ) );
-        daoUtil.setString( 3, actionButton.getHtmlContent( ) );
-        daoUtil.setString( 4, actionButton.getResourceType( ) );
-        daoUtil.setInt( 5, getNewOrder( plugin ) );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_INSERT, plugin ) )
+        {
+            actionButton.setIdAction( newPrimaryKey( plugin ) );
+            daoUtil.setInt( 1, actionButton.getIdAction( ) );
+            daoUtil.setString( 2, actionButton.getName( ) );
+            daoUtil.setString( 3, actionButton.getHtmlContent( ) );
+            daoUtil.setString( 4, actionButton.getResourceType( ) );
+            daoUtil.setInt( 5, getNewOrder( plugin ) );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -109,21 +113,21 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public ActionButton findById( int nIdActionButton, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin );
-        daoUtil.setInt( 1, nIdActionButton );
-        daoUtil.executeQuery( );
         ActionButton action = null;
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, plugin ) )
         {
-            action = new ActionButton( );
-            action.setIdAction( daoUtil.getInt( 1 ) );
-            action.setName( daoUtil.getString( 2 ) );
-            action.setHtmlContent( daoUtil.getString( 3 ) );
-            action.setResourceType( daoUtil.getString( 4 ) );
-            action.setOrder( daoUtil.getInt( 5 ) );
+            daoUtil.setInt( 1, nIdActionButton );
+            daoUtil.executeQuery( );
+            if ( daoUtil.next( ) )
+            {
+                action = new ActionButton( );
+                action.setIdAction( daoUtil.getInt( 1 ) );
+                action.setName( daoUtil.getString( 2 ) );
+                action.setHtmlContent( daoUtil.getString( 3 ) );
+                action.setResourceType( daoUtil.getString( 4 ) );
+                action.setOrder( daoUtil.getInt( 5 ) );
+            }
         }
-
-        daoUtil.free( );
 
         return action;
     }
@@ -134,13 +138,14 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public void update( ActionButton actionButton, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_UPDATE, plugin );
-        daoUtil.setString( 1, actionButton.getName( ) );
-        daoUtil.setString( 2, actionButton.getHtmlContent( ) );
-        daoUtil.setString( 3, actionButton.getResourceType( ) );
-        daoUtil.setInt( 4, actionButton.getIdAction( ) );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_UPDATE, plugin ) )
+        {
+            daoUtil.setString( 1, actionButton.getName( ) );
+            daoUtil.setString( 2, actionButton.getHtmlContent( ) );
+            daoUtil.setString( 3, actionButton.getResourceType( ) );
+            daoUtil.setInt( 4, actionButton.getIdAction( ) );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -149,10 +154,11 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public void delete( int nIdActionButton, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_DELETE, plugin );
-        daoUtil.setInt( 1, nIdActionButton );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_DELETE, plugin ) )
+        {
+            daoUtil.setInt( 1, nIdActionButton );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -161,21 +167,21 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public List<ActionButton> findAll( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin );
-        daoUtil.executeQuery( );
-        List<ActionButton> listActions = new ArrayList<ActionButton>( );
-        while ( daoUtil.next( ) )
+        List<ActionButton> listActions = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL, plugin ) )
         {
-            ActionButton action = new ActionButton( );
-            action.setIdAction( daoUtil.getInt( 1 ) );
-            action.setName( daoUtil.getString( 2 ) );
-            action.setHtmlContent( daoUtil.getString( 3 ) );
-            action.setResourceType( daoUtil.getString( 4 ) );
-            action.setOrder( daoUtil.getInt( 5 ) );
-            listActions.add( action );
+            daoUtil.executeQuery( );
+            while ( daoUtil.next( ) )
+            {
+                ActionButton action = new ActionButton( );
+                action.setIdAction( daoUtil.getInt( 1 ) );
+                action.setName( daoUtil.getString( 2 ) );
+                action.setHtmlContent( daoUtil.getString( 3 ) );
+                action.setResourceType( daoUtil.getString( 4 ) );
+                action.setOrder( daoUtil.getInt( 5 ) );
+                listActions.add( action );
+            }
         }
-
-        daoUtil.free( );
 
         return listActions;
     }
@@ -186,22 +192,22 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public List<ActionButton> findAllByResourceType( String strResourceType, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_BY_RESOURCE_TYPE, plugin );
-        daoUtil.setString( 1, strResourceType );
-        daoUtil.executeQuery( );
-        List<ActionButton> listActions = new ArrayList<ActionButton>( );
-        while ( daoUtil.next( ) )
+        List<ActionButton> listActions = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_ALL_BY_RESOURCE_TYPE, plugin ) )
         {
-            ActionButton action = new ActionButton( );
-            action.setIdAction( daoUtil.getInt( 1 ) );
-            action.setName( daoUtil.getString( 2 ) );
-            action.setHtmlContent( daoUtil.getString( 3 ) );
-            action.setResourceType( daoUtil.getString( 4 ) );
-            action.setOrder( daoUtil.getInt( 5 ) );
-            listActions.add( action );
+            daoUtil.setString( 1, strResourceType );
+            daoUtil.executeQuery( );
+            while ( daoUtil.next( ) )
+            {
+                ActionButton action = new ActionButton( );
+                action.setIdAction( daoUtil.getInt( 1 ) );
+                action.setName( daoUtil.getString( 2 ) );
+                action.setHtmlContent( daoUtil.getString( 3 ) );
+                action.setResourceType( daoUtil.getString( 4 ) );
+                action.setOrder( daoUtil.getInt( 5 ) );
+                listActions.add( action );
+            }
         }
-
-        daoUtil.free( );
 
         return listActions;
     }
@@ -212,21 +218,21 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public ActionButton findByName( String strName, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_NAME, plugin );
-        daoUtil.setString( 1, strName );
-        daoUtil.executeQuery( );
         ActionButton action = null;
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_NAME, plugin ) )
         {
-            action = new ActionButton( );
-            action.setIdAction( daoUtil.getInt( 1 ) );
-            action.setName( daoUtil.getString( 2 ) );
-            action.setHtmlContent( daoUtil.getString( 3 ) );
-            action.setResourceType( daoUtil.getString( 4 ) );
-            action.setOrder( daoUtil.getInt( 5 ) );
+            daoUtil.setString( 1, strName );
+            daoUtil.executeQuery( );
+            if ( daoUtil.next( ) )
+            {
+                action = new ActionButton( );
+                action.setIdAction( daoUtil.getInt( 1 ) );
+                action.setName( daoUtil.getString( 2 ) );
+                action.setHtmlContent( daoUtil.getString( 3 ) );
+                action.setResourceType( daoUtil.getString( 4 ) );
+                action.setOrder( daoUtil.getInt( 5 ) );
+            }
         }
-
-        daoUtil.free( );
 
         return action;
     }
@@ -237,7 +243,7 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public List<ActionButton> findActionButtons( List<Integer> listIdActions, Plugin plugin )
     {
-        List<ActionButton> listActions = new ArrayList<ActionButton>( );
+        List<ActionButton> listActions = new ArrayList<>( );
         if ( listIdActions != null && listIdActions.size( ) > 0 )
         {
             StringBuilder sbSql = new StringBuilder( SQL_QUERY_SELECT_FROM_LIST_ID );
@@ -251,25 +257,25 @@ public class ActionButtonDAO implements IActionButtonDAO
             }
             sbSql.append( CONSTANT_CLOSE_PARENTHESIS );
             sbSql.append( SQL_ORDER_BY_BTN_ORDER );
-            DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), plugin );
-            int nIndex = 1;
-            for ( Integer nIdAction : listIdActions )
+            try ( DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), plugin ) )
             {
-                daoUtil.setInt( nIndex++, nIdAction );
+                int nIndex = 1;
+                for ( Integer nIdAction : listIdActions )
+                {
+                    daoUtil.setInt( nIndex++, nIdAction );
+                }
+                daoUtil.executeQuery( );
+                while ( daoUtil.next( ) )
+                {
+                    ActionButton action = new ActionButton( );
+                    action.setIdAction( daoUtil.getInt( 1 ) );
+                    action.setName( daoUtil.getString( 2 ) );
+                    action.setHtmlContent( daoUtil.getString( 3 ) );
+                    action.setResourceType( daoUtil.getString( 4 ) );
+                    action.setOrder( daoUtil.getInt( 5 ) );
+                    listActions.add( action );
+                }
             }
-            daoUtil.executeQuery( );
-            while ( daoUtil.next( ) )
-            {
-                ActionButton action = new ActionButton( );
-                action.setIdAction( daoUtil.getInt( 1 ) );
-                action.setName( daoUtil.getString( 2 ) );
-                action.setHtmlContent( daoUtil.getString( 3 ) );
-                action.setResourceType( daoUtil.getString( 4 ) );
-                action.setOrder( daoUtil.getInt( 5 ) );
-                listActions.add( action );
-            }
-
-            daoUtil.free( );
         }
         return listActions;
     }
@@ -280,19 +286,20 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public int getNewOrder( Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_ORDER, plugin );
-        daoUtil.executeQuery( );
-        int nResult = 1;
-        if ( daoUtil.next( ) )
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_GET_NEW_ORDER, plugin ) )
         {
-            nResult = daoUtil.getInt( 1 );
-            if ( nResult == 0 )
+            daoUtil.executeQuery( );
+            int nResult = 1;
+            if ( daoUtil.next( ) )
             {
-                nResult++;
+                nResult = daoUtil.getInt( 1 );
+                if ( nResult == 0 )
+                {
+                    nResult++;
+                }
             }
+            return nResult;
         }
-        daoUtil.free( );
-        return nResult;
     }
 
     /**
@@ -301,11 +308,12 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public void updateActionButtonOrder( int nIdAction, int nNewOrder, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_UPDATE_BTN_ORDER, plugin );
-        daoUtil.setInt( 1, nNewOrder );
-        daoUtil.setInt( 2, nIdAction );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_UPDATE_BTN_ORDER, plugin ) )
+        {
+            daoUtil.setInt( 1, nNewOrder );
+            daoUtil.setInt( 2, nIdAction );
+            daoUtil.executeUpdate( );
+        }
     }
 
     /**
@@ -314,22 +322,22 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public List<ActionButton> findByOrder( int nNewOrder, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ORDER, plugin );
-        daoUtil.setInt( 1, nNewOrder );
-        daoUtil.executeQuery( );
-        List<ActionButton> listAction = new ArrayList<ActionButton>( );
-        if ( daoUtil.next( ) )
+        List<ActionButton> listAction = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT_BY_ORDER, plugin ) )
         {
-            ActionButton action = new ActionButton( );
-            action.setIdAction( daoUtil.getInt( 1 ) );
-            action.setName( daoUtil.getString( 2 ) );
-            action.setHtmlContent( daoUtil.getString( 3 ) );
-            action.setResourceType( daoUtil.getString( 4 ) );
-            action.setOrder( daoUtil.getInt( 5 ) );
-            listAction.add( action );
+            daoUtil.setInt( 1, nNewOrder );
+            daoUtil.executeQuery( );
+            if ( daoUtil.next( ) )
+            {
+                ActionButton action = new ActionButton( );
+                action.setIdAction( daoUtil.getInt( 1 ) );
+                action.setName( daoUtil.getString( 2 ) );
+                action.setHtmlContent( daoUtil.getString( 3 ) );
+                action.setResourceType( daoUtil.getString( 4 ) );
+                action.setOrder( daoUtil.getInt( 5 ) );
+                listAction.add( action );
+            }
         }
-
-        daoUtil.free( );
 
         return listAction;
     }
@@ -340,9 +348,10 @@ public class ActionButtonDAO implements IActionButtonDAO
     @Override
     public void fillBlankInOrder( int nOrder, Plugin plugin )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_UPDATE_FILL_BLANK_IN_ORDER, plugin );
-        daoUtil.setInt( 1, nOrder );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_UPDATE_FILL_BLANK_IN_ORDER, plugin ) )
+        {
+            daoUtil.setInt( 1, nOrder );
+            daoUtil.executeUpdate( );
+        }
     }
 }

@@ -40,10 +40,15 @@ import fr.paris.lutece.portal.service.plugin.PluginService;
 
 import java.util.List;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Named;
+
 
 /**
  * ActionbarService
  */
+@ApplicationScoped
+@Named( ActionbarService.BEAN_NAME )
 public class ActionbarService
 {
     /**
