@@ -37,6 +37,7 @@ import fr.paris.lutece.plugins.extend.business.extender.config.IExtenderConfigDA
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarPlugin;
 import fr.paris.lutece.portal.service.plugin.Plugin;
 import fr.paris.lutece.util.sql.DAOUtil;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ import java.util.List;
 /**
  * DAO to manage ActionbarExtenderConfig objects.
  */
+@ApplicationScoped
 public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarExtenderConfig>
 {
     private static final String SQL_QUERY_SELECT = " SELECT id_action FROM extend_actionbar_config WHERE id_extender = ? ";
@@ -80,15 +82,16 @@ public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarE
         }
         sbSql.append( SQL_VALUE_SOCIAL_HUB );
 
-        DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), ActionbarPlugin.getPlugin( ) );
-        int nIndex = 0;
-        for ( Integer nId : listIdActions )
+        try ( DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), plugin ) )
         {
-            daoUtil.setInt( ++nIndex, nIdExtender );
-            daoUtil.setInt( ++nIndex, nId );
+            int nIndex = 0;
+            for ( Integer nId : listIdActions )
+            {
+                daoUtil.setInt( ++nIndex, nIdExtender );
+                daoUtil.setInt( ++nIndex, nId );
+            }
+            daoUtil.executeUpdate( );
         }
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
     }
 
     /**
@@ -114,16 +117,16 @@ public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarE
         sbSql.append( CONSTANT_QUESTION_MARK );
         sbSql.append( CONSTANT_CLOSE_PARENTHESIS );
 
-        DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), ActionbarPlugin.getPlugin( ) );
-        int nIndex = 0;
-        daoUtil.setInt( ++nIndex, nIdExtender );
-
-        for ( Integer nId : listIdActions )
+        try ( DAOUtil daoUtil = new DAOUtil( sbSql.toString( ), plugin ) )
         {
-            daoUtil.setInt( ++nIndex, nId );
+            int nIndex = 0;
+            daoUtil.setInt( ++nIndex, nIdExtender );
+            for ( Integer nId : listIdActions )
+            {
+                daoUtil.setInt( ++nIndex, nId );
+            }
+            daoUtil.executeUpdate( );
         }
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
     }
 
     /**
@@ -181,31 +184,29 @@ public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarE
     @Override
     public ActionbarExtenderConfig load( int nIdExtender )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, ActionbarPlugin.getPlugin( ) );
-        daoUtil.setInt( 1, nIdExtender );
-        daoUtil.executeQuery( );
-
         ActionbarExtenderConfig actionbarExtenderConfig = new ActionbarExtenderConfig( );
         actionbarExtenderConfig.setIdExtender( nIdExtender );
 
-        List<Integer> listActionsIds = new ArrayList<Integer>( );
-        int nId = 1;
-        // We break if we found -1 (which means every button)
-        while ( nId > 0 && daoUtil.next( ) )
+        List<Integer> listActionsIds = new ArrayList<>( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_QUERY_SELECT, ActionbarPlugin.getPlugin( ) ) )
         {
-            nId = daoUtil.getInt( 1 );
-            if ( nId > 0 )
+            daoUtil.setInt( 1, nIdExtender );
+            daoUtil.executeQuery( );
+            int nId = 1;
+            while ( nId > 0 && daoUtil.next( ) )
             {
-                listActionsIds.add( nId );
-            }
-            else
-            {
-                actionbarExtenderConfig.setAllButtons( true );
-                actionbarExtenderConfig.setListActionButtonId( new ArrayList<Integer>( ) );
+                nId = daoUtil.getInt( 1 );
+                if ( nId > 0 )
+                {
+                    listActionsIds.add( nId );
+                }
+                else
+                {
+                    actionbarExtenderConfig.setAllButtons( true );
+                }
             }
         }
         actionbarExtenderConfig.setListActionButtonId( listActionsIds );
-        daoUtil.free( );
         return actionbarExtenderConfig;
     }
 
@@ -215,9 +216,10 @@ public class ActionbarExtenderConfigDAO implements IExtenderConfigDAO<ActionbarE
     @Override
     public void delete( int nIdExtender )
     {
-        DAOUtil daoUtil = new DAOUtil( SQL_DELETE_CONFIG, ActionbarPlugin.getPlugin( ) );
-        daoUtil.setInt( 1, nIdExtender );
-        daoUtil.executeUpdate( );
-        daoUtil.free( );
+        try ( DAOUtil daoUtil = new DAOUtil( SQL_DELETE_CONFIG, ActionbarPlugin.getPlugin( ) ) )
+        {
+            daoUtil.setInt( 1, nIdExtender );
+            daoUtil.executeUpdate( );
+        }
     }
 }

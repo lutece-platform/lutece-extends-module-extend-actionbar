@@ -6,5 +6,5 @@
 	<#assign unremovable = extenderTypesInstalled.actionbar>
 </#if>
 <@createExtenderFromResource extenderType="actionbar" installed=installed unremovable=unremovable labelAdd="#i18n{module.extend.actionbar.create_extender_from_resource.labelAddExtender}" labelRemove="#i18n{module.extend.actionbar.create_extender_from_resource.labelRemoveExtender}" target="preview">
-	<@span><@icon style='palette' /> #i18n{module.extend.actionbar.extender.actionbar.label}</@span>
+	<@span><@icon style='click' /> #i18n{module.extend.actionbar.extender.actionbar.label}</@span>
 </@createExtenderFromResource>
