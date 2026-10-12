@@ -33,60 +33,71 @@
  */
 package fr.paris.lutece.plugins.extend.modules.actionbar.web;
 
-import fr.paris.lutece.plugins.extend.modules.actionbar.business.ActionButton;
-import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarResourceIdService;
-import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarService;
-import fr.paris.lutece.plugins.extend.service.type.ExtendableResourceTypeService;
-import fr.paris.lutece.plugins.extend.service.type.IExtendableResourceTypeService;
-import fr.paris.lutece.portal.business.user.AdminUser;
-import fr.paris.lutece.portal.service.admin.AdminUserService;
-import fr.paris.lutece.portal.service.i18n.I18nService;
-import fr.paris.lutece.portal.service.message.AdminMessage;
-import fr.paris.lutece.portal.service.message.AdminMessageService;
-import fr.paris.lutece.portal.service.rbac.RBACService;
-import fr.paris.lutece.portal.service.spring.SpringContextService;
-import fr.paris.lutece.portal.service.template.AppTemplateService;
-import fr.paris.lutece.portal.service.util.AppPathService;
-import fr.paris.lutece.portal.service.util.AppPropertiesService;
-import fr.paris.lutece.portal.web.admin.AdminFeaturesPageJspBean;
-import fr.paris.lutece.portal.web.pluginaction.DefaultPluginActionResult;
-import fr.paris.lutece.portal.web.pluginaction.IPluginActionResult;
-import fr.paris.lutece.util.ReferenceItem;
-import fr.paris.lutece.util.ReferenceList;
-import fr.paris.lutece.util.datatable.DataTableManager;
-import fr.paris.lutece.util.html.HtmlTemplate;
-import fr.paris.lutece.util.url.UrlItem;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 
+import fr.paris.lutece.api.user.User;
+import fr.paris.lutece.plugins.extend.modules.actionbar.business.ActionButton;
+import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarResourceIdService;
+import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarService;
+import fr.paris.lutece.plugins.extend.service.type.IExtendableResourceTypeService;
+import fr.paris.lutece.portal.service.i18n.I18nService;
+import fr.paris.lutece.portal.service.message.AdminMessage;
+import fr.paris.lutece.portal.service.message.AdminMessageService;
+import fr.paris.lutece.portal.service.rbac.RBACService;
+import fr.paris.lutece.portal.util.mvc.admin.MVCAdminJspBean;
+import fr.paris.lutece.portal.util.mvc.admin.annotations.Controller;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.Action;
+import fr.paris.lutece.portal.util.mvc.commons.annotations.View;
+import fr.paris.lutece.portal.util.mvc.utils.MVCUtils;
+import fr.paris.lutece.portal.web.cdi.mvc.Models;
+import fr.paris.lutece.portal.web.util.IPager;
+import fr.paris.lutece.portal.web.util.Pager;
+import fr.paris.lutece.util.ReferenceItem;
+import fr.paris.lutece.util.ReferenceList;
+import fr.paris.lutece.util.url.UrlItem;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * JspBean of ActionBar plugin.
+ * Back office management of the action buttons.
  */
-public class ActionbarJspBean extends AdminFeaturesPageJspBean
+@RequestScoped
+@Named( "actionbarJspBean" )
+@Controller( controllerJsp = ActionbarJspBean.CONTROLLER_JSP, controllerPath = ActionbarJspBean.CONTROLLER_PATH, right = ActionbarJspBean.MANAGE_ACTION_BUTTONS, securityTokenEnabled = true )
+public class ActionbarJspBean extends MVCAdminJspBean
 {
     /**
      * Right to manage action buttons
      */
     public static final String MANAGE_ACTION_BUTTONS = "MANAGE_ACTION_BUTTONS";
 
-    /**
-     * Serial version UID
-     */
+    /** The controller JSP */
+    public static final String CONTROLLER_JSP = "ManageActionButtons.jsp";
+
+    /** The controller path */
+    public static final String CONTROLLER_PATH = "jsp/admin/plugins/extend/modules/actionbar/";
+
     private static final long serialVersionUID = 3580512845617771375L;
 
+    // VIEWS
+    private static final String VIEW_MANAGE_ACTION_BUTTONS = "manageActionButtons";
+    private static final String VIEW_CREATE_ACTION_BUTTON = "createActionButton";
+    private static final String VIEW_MODIFY_ACTION_BUTTON = "modifyActionButton";
+    private static final String VIEW_CONFIRM_REMOVE_ACTION_BUTTON = "confirmRemoveActionButton";
+
+    // ACTIONS
+    private static final String ACTION_CREATE_ACTION_BUTTON = VIEW_CREATE_ACTION_BUTTON;
+    private static final String ACTION_MODIFY_ACTION_BUTTON = VIEW_MODIFY_ACTION_BUTTON;
+    private static final String ACTION_REMOVE_ACTION_BUTTON = "removeActionButton";
+    private static final String ACTION_MOVE_ACTION_BUTTON = "moveActionButton";
+
     // PARAMETERS
-    private static final String PARAMETER_ACTION_NAME = "name";
-    private static final String PARAMETER_ACTION_ORDER = "order";
-    //    private static final String PARAMETER_RESOURCE_TYPE = "resourceType";
-    private static final String PARAMETER_CANCEL = "cancel";
     private static final String PARAMETER_ID_ACTION_BUTTON = "id_action";
     private static final String PARAM_NAME = "name";
     private static final String PARAM_HTML_CONTENT = "html_content";
@@ -100,21 +111,15 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
     private static final String PROPERTY_DEFAULT_ITEMS_PER_PAGE = "module.extend.actionbar.manage_action_buttons.itemsPerPage";
 
     // MARKS
-    private static final String MARK_DATA_TABLE_MANAGER = "dataTableManager";
+    private static final String MARK_ACTION_BUTTON_LIST = "action_button_list";
     private static final String MARK_PERMISSIONS = "permissions";
-    private static final String MARK_LOCALE = "locale";
-    private static final String MARK_WEBAPP_URL = "webapp_url";
     private static final String MARK_ACTION_BUTTON = "action_button";
     private static final String MARK_RESOURCE_TYPES = "resourceTypes";
     private static final String MARK_LAST_ORDER = "last_order";
 
     // MESSAGES
-    private static final String MESSAGE_LABEL_ACTION_NAME = "module.extend.actionbar.manage_action_buttons.actionbutton.name";
-    private static final String MESSAGE_LABEL_ACTION_ORDER = "module.extend.actionbar.manage_action_buttons.actionbutton.order";
-    //    private static final String MESSAGE_LABEL_RESOURCE_TYPE = "module.extend.actionbar.manage_action_buttons.actionbutton.resourceType";
-    private static final String MESSAGE_LABEL_ACTION = "module.extend.actionbar.manage_action_buttons.actionbutton.action";
     private static final String MESSAGE_UNAUTHORIZED_ACTION = "extend.message.unauthorizedAction";
-    private static final String MESSAGE_CONFIRM_REMOVE_SOCIALHUB = "module.extend.actionbar.remove_action_button.confirmRemoveActionButton";
+    private static final String MESSAGE_CONFIRM_REMOVE_ACTION_BUTTON = "module.extend.actionbar.remove_action_button.confirmRemoveActionButton";
     private static final String MESSAGE_MANDATORY_FIELDS = "portal.util.message.mandatoryFields";
     private static final String MESSAGE_ACTION_BUTTON_NOT_FOUND = "module.extend.actionbar.manage_action_buttons.actionbutton.actionButtonNotFound";
     private static final String MESSAGE_LABEL_EVERY_RESOURCE_TYPE = "module.extend.actionbar.add_action_button.everyResourceType";
@@ -124,101 +129,62 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
     private static final String TEMPLATE_ADD_ACTION_BUTTON = "admin/plugins/extend/modules/actionbar/add_action_button.html";
     private static final String TEMPLATE_MODIFY_ACTION_BUTTON = "admin/plugins/extend/modules/actionbar/modify_action_button.html";
 
-    // URLS
-    private static final String JSP_URL_MANAGE_ACTION_BUTTONS = "jsp/admin/plugins/extend/modules/actionbar/GetManageActionButtons.jsp";
-    private static final String JSP_URL_REMOVE_ACTION_BUTTON = "jsp/admin/plugins/extend/modules/actionbar/DoRemoveActionButton.jsp";
-
-    // local variables
     @Inject
-    private ActionbarService _actionbarService = SpringContextService.getBean( ActionbarService.BEAN_NAME );
-    private IExtendableResourceTypeService _resourceTypeService = SpringContextService
-            .getBean( ExtendableResourceTypeService.BEAN_SERVICE );
-    private DataTableManager<ActionButton> _dataTableManager;
+    private ActionbarService _actionbarService;
+
+    @Inject
+    private IExtendableResourceTypeService _resourceTypeService;
+
+    @Inject
+    @Pager( listBookmark = MARK_ACTION_BUTTON_LIST, defaultItemsPerPage = PROPERTY_DEFAULT_ITEMS_PER_PAGE, baseUrl = CONTROLLER_PATH + CONTROLLER_JSP )
+    private IPager<ActionButton, Void> _pager;
 
     /**
      * Get the manage action buttons page.
      * @param request The request
+     * @param model The model
      * @return The HTML content to display
      */
-    public String getManageActionButtons( HttpServletRequest request )
+    @View( value = VIEW_MANAGE_ACTION_BUTTONS, defaultView = true, securityTokenAction = ACTION_MOVE_ACTION_BUTTON )
+    public String getManageActionButtons( HttpServletRequest request, Models model )
     {
-        setPageTitleProperty( PROPERTY_MANAGE_ACTION_BUTTONS_PAGE_TITLE );
-
-        if ( _dataTableManager == null )
+        if ( request.getParameter( MVCUtils.PARAMETER_VIEW ) == null )
         {
-            _dataTableManager = new DataTableManager<ActionButton>( JSP_URL_MANAGE_ACTION_BUTTONS,
-                    JSP_URL_MANAGE_ACTION_BUTTONS, AppPropertiesService.getPropertyInt(
-                            PROPERTY_DEFAULT_ITEMS_PER_PAGE, 50 ), true );
-            _dataTableManager.addColumn( MESSAGE_LABEL_ACTION_NAME, PARAMETER_ACTION_NAME, true );
-            _dataTableManager.addColumn( MESSAGE_LABEL_ACTION_ORDER, PARAMETER_ACTION_ORDER, true );
-            //            _dataTableManager.addColumn( MESSAGE_LABEL_RESOURCE_TYPE, PARAMETER_RESOURCE_TYPE, true );
-            _dataTableManager.addActionColumn( MESSAGE_LABEL_ACTION );
+            return redirectView( request, VIEW_MANAGE_ACTION_BUTTONS );
         }
-        _dataTableManager.filterSortAndPaginate( request, _actionbarService.findAllActionButtons( ) );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_DATA_TABLE_MANAGER, _dataTableManager );
+        UrlItem urlPager = new UrlItem( CONTROLLER_PATH + CONTROLLER_JSP );
+        urlPager.addParameter( MVCUtils.PARAMETER_VIEW, VIEW_MANAGE_ACTION_BUTTONS );
+        _pager.withBaseUrl( urlPager.getUrl( ) ).withListItem( _actionbarService.findAllActionButtons( ) ).populateModels( request, model, getLocale( ) );
 
-        AdminUser user = AdminUserService.getAdminUser( request );
-
-        Map<String, Boolean> mapPermissions = new HashMap<String, Boolean>( );
-        mapPermissions.put( ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON, RBACService.isAuthorized(
-                ActionButton.RESOURCE_TYPE, null, ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON, user ) );
-        mapPermissions.put( ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON, RBACService.isAuthorized(
-                ActionButton.RESOURCE_TYPE, null, ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON, user ) );
-        mapPermissions.put( ActionbarResourceIdService.PERMISSION_REMOVE_ACTION_BUTTON, RBACService.isAuthorized(
-                ActionButton.RESOURCE_TYPE, null, ActionbarResourceIdService.PERMISSION_REMOVE_ACTION_BUTTON, user ) );
+        Map<String, Boolean> mapPermissions = new HashMap<>( );
+        mapPermissions.put( ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON, isAuthorized( ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON ) );
+        mapPermissions.put( ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON, isAuthorized( ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON ) );
+        mapPermissions.put( ActionbarResourceIdService.PERMISSION_REMOVE_ACTION_BUTTON, isAuthorized( ActionbarResourceIdService.PERMISSION_REMOVE_ACTION_BUTTON ) );
 
         model.put( MARK_PERMISSIONS, mapPermissions );
         model.put( MARK_LAST_ORDER, _actionbarService.getNewOrder( ) - 1 );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MANAGE_ACTION_BUTTONS,
-                AdminUserService.getLocale( request ), model );
-
-        String strContent = getAdminPage( template.getHtml( ) );
-        _dataTableManager.clearItems( );
-
-        return strContent;
+        return getPage( PROPERTY_MANAGE_ACTION_BUTTONS_PAGE_TITLE, TEMPLATE_MANAGE_ACTION_BUTTONS, model );
     }
 
     /**
      * Get the page to add an action button
      * @param request The request
-     * @return A IPluginActionResult containing the URL to redirect to or the
-     *         HTML content to display
+     * @param model The model
+     * @return The HTML content to display, or the redirection to an error message
      */
-    public IPluginActionResult getAddActionButton( HttpServletRequest request )
+    @View( VIEW_CREATE_ACTION_BUTTON )
+    public String getCreateActionButton( HttpServletRequest request, Models model )
     {
-        if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
-                ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON, AdminUserService.getAdminUser( request ) ) )
+        if ( !isAuthorized( ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON ) )
         {
-            IPluginActionResult result = new DefaultPluginActionResult( );
-            result.setRedirect( AdminMessageService.getMessageUrl( request, MESSAGE_UNAUTHORIZED_ACTION,
-                    AdminMessage.TYPE_STOP ) );
-
-            return result;
+            return redirectUnauthorized( request );
         }
 
-        setPageTitleProperty( PROPERTY_ADD_ACTION_BUTTON_PAGE_TITLE );
+        model.put( MARK_RESOURCE_TYPES, getResourceTypes( getLocale( ) ) );
 
-        Locale locale = AdminUserService.getLocale( request );
-        ReferenceList refListResourceTypes = _resourceTypeService.findAllAsRef( locale );
-        ReferenceItem refItem = new ReferenceItem( );
-        refItem.setCode( ActionButton.EVERY_RESOURCE_TYPE );
-        refItem.setName( I18nService.getLocalizedString( MESSAGE_LABEL_EVERY_RESOURCE_TYPE, locale ) );
-        refListResourceTypes.add( 0, refItem );
-
-        Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_LOCALE, locale );
-        model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
-        model.put( MARK_RESOURCE_TYPES, refListResourceTypes );
-
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_ADD_ACTION_BUTTON,
-                AdminUserService.getLocale( request ), model );
-
-        IPluginActionResult result = new DefaultPluginActionResult( );
-        result.setHtmlContent( getAdminPage( template.getHtml( ) ) );
-        return result;
+        return getPage( PROPERTY_ADD_ACTION_BUTTON_PAGE_TITLE, TEMPLATE_ADD_ACTION_BUTTON, model );
     }
 
     /**
@@ -226,106 +192,50 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
      * @param request The request
      * @return The next URL to redirect to
      */
-    public String doAddActionButton( HttpServletRequest request )
+    @Action( ACTION_CREATE_ACTION_BUTTON )
+    public String doCreateActionButton( HttpServletRequest request )
     {
-        if ( request.getParameter( PARAMETER_CANCEL ) != null )
+        if ( !isAuthorized( ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON ) )
         {
-            return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
+            return redirectUnauthorized( request );
         }
 
-        if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
-                ActionbarResourceIdService.PERMISSION_ADD_ACTION_BUTTON, AdminUserService.getAdminUser( request ) ) )
+        ActionButton actionButton = getActionButtonFromRequest( request );
+        if ( actionButton == null )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_UNAUTHORIZED_ACTION, AdminMessage.TYPE_STOP );
+            addError( MESSAGE_MANDATORY_FIELDS, getLocale( ) );
+            return redirectView( request, VIEW_CREATE_ACTION_BUTTON );
         }
-
-        String strName = request.getParameter( PARAM_NAME );
-        if ( StringUtils.isBlank( strName ) )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
-        }
-
-        String strHtmlContent = request.getParameter( PARAM_HTML_CONTENT );
-        if ( StringUtils.isBlank( strHtmlContent ) )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
-        }
-        String strResourceType = request.getParameter( PARAM_RESOURCE_TYPE );
-        if ( StringUtils.isBlank( strResourceType ) )
-        {
-            strResourceType = ActionButton.EVERY_RESOURCE_TYPE;
-        }
-
-        ActionButton actionButton = new ActionButton( );
-        actionButton.setName( strName );
-        actionButton.setHtmlContent( strHtmlContent );
-        actionButton.setResourceType( strResourceType );
 
         _actionbarService.createActionButton( actionButton );
 
-        return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
+        return redirectView( request, VIEW_MANAGE_ACTION_BUTTONS );
     }
 
     /**
      * Get the page to modify an action button
      * @param request The request
-     * @return A IPluginActionResult containing the URL to redirect to or the
-     *         HTML content to display
+     * @param model The model
+     * @return The HTML content to display, or the redirection to an error message
      */
-    public IPluginActionResult getModifyActionButton( HttpServletRequest request )
+    @View( VIEW_MODIFY_ACTION_BUTTON )
+    public String getModifyActionButton( HttpServletRequest request, Models model )
     {
-        if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
-                ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON, AdminUserService.getAdminUser( request ) ) )
+        if ( !isAuthorized( ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON ) )
         {
-            IPluginActionResult result = new DefaultPluginActionResult( );
-            result.setRedirect( AdminMessageService.getMessageUrl( request, MESSAGE_UNAUTHORIZED_ACTION,
-                    AdminMessage.TYPE_STOP ) );
-
-            return result;
+            return redirectUnauthorized( request );
         }
 
-        setPageTitleProperty( PROPERTY_MODIFY_ACTION_BUTTON_PAGE_TITLE );
-
-        int nActionButtonId = 0;
-        try
-        {
-            nActionButtonId = Integer.parseInt( request.getParameter( PARAMETER_ID_ACTION_BUTTON ) );
-        }
-        catch ( NumberFormatException e )
-        {
-            IPluginActionResult result = new DefaultPluginActionResult( );
-            result.setRedirect( AdminMessageService.getMessageUrl( request, MESSAGE_ACTION_BUTTON_NOT_FOUND,
-                    AdminMessage.TYPE_STOP ) );
-            return result;
-        }
-
-        ActionButton actionButton = _actionbarService.findActionButton( nActionButtonId );
+        ActionButton actionButton = findActionButton( request );
         if ( actionButton == null )
         {
-            IPluginActionResult result = new DefaultPluginActionResult( );
-            result.setRedirect( AdminMessageService.getMessageUrl( request, MESSAGE_ACTION_BUTTON_NOT_FOUND,
-                    AdminMessage.TYPE_STOP ) );
-            return result;
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ACTION_BUTTON_NOT_FOUND, AdminMessage.TYPE_STOP ) );
         }
-        Locale locale = AdminUserService.getLocale( request );
-        ReferenceList refListResourceTypes = _resourceTypeService.findAllAsRef( locale );
-        ReferenceItem refItem = new ReferenceItem( );
-        refItem.setCode( ActionButton.EVERY_RESOURCE_TYPE );
-        refItem.setName( I18nService.getLocalizedString( MESSAGE_LABEL_EVERY_RESOURCE_TYPE, locale ) );
-        refListResourceTypes.add( 0, refItem );
 
-        Map<String, Object> model = new HashMap<String, Object>( );
-        model.put( MARK_LOCALE, locale );
-        model.put( MARK_WEBAPP_URL, AppPathService.getBaseUrl( request ) );
         model.put( MARK_ACTION_BUTTON, actionButton );
-        model.put( MARK_RESOURCE_TYPES, refListResourceTypes );
+        model.put( MARK_RESOURCE_TYPES, getResourceTypes( getLocale( ) ) );
 
-        HtmlTemplate template = AppTemplateService.getTemplate( TEMPLATE_MODIFY_ACTION_BUTTON,
-                AdminUserService.getLocale( request ), model );
-
-        IPluginActionResult result = new DefaultPluginActionResult( );
-        result.setHtmlContent( getAdminPage( template.getHtml( ) ) );
-        return result;
+        return getPage( PROPERTY_MODIFY_ACTION_BUTTON_PAGE_TITLE, TEMPLATE_MODIFY_ACTION_BUTTON, model );
     }
 
     /**
@@ -333,52 +243,31 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
      * @param request The request
      * @return The next URL to redirect to
      */
+    @Action( ACTION_MODIFY_ACTION_BUTTON )
     public String doModifyActionButton( HttpServletRequest request )
     {
-        if ( request.getParameter( PARAMETER_CANCEL ) != null )
+        if ( !isAuthorized( ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON ) )
         {
-            return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
+            return redirectUnauthorized( request );
         }
 
-        if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
-                ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON, AdminUserService.getAdminUser( request ) ) )
+        ActionButton existing = findActionButton( request );
+        if ( existing == null )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_UNAUTHORIZED_ACTION, AdminMessage.TYPE_STOP );
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ACTION_BUTTON_NOT_FOUND, AdminMessage.TYPE_STOP ) );
         }
 
-        String strName = request.getParameter( PARAM_NAME );
-        String strHtmlContent = request.getParameter( PARAM_HTML_CONTENT );
-
-        if ( StringUtils.isBlank( strHtmlContent ) || StringUtils.isBlank( strName ) )
+        ActionButton actionButton = getActionButtonFromRequest( request );
+        if ( actionButton == null )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+            addError( MESSAGE_MANDATORY_FIELDS, getLocale( ) );
+            return redirect( request, VIEW_MODIFY_ACTION_BUTTON, PARAMETER_ID_ACTION_BUTTON, existing.getIdAction( ) );
         }
 
-        int nIdActionButton = 0;
-        try
-        {
-            nIdActionButton = Integer.parseInt( request.getParameter( PARAMETER_ID_ACTION_BUTTON ) );
-        }
-        catch ( NumberFormatException e )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
-        }
-
-        String strResourceType = request.getParameter( PARAM_RESOURCE_TYPE );
-        if ( StringUtils.isBlank( strResourceType ) )
-        {
-            strResourceType = ActionButton.EVERY_RESOURCE_TYPE;
-        }
-
-        ActionButton actionButton = new ActionButton( );
-        actionButton.setName( strName );
-        actionButton.setHtmlContent( strHtmlContent );
-        actionButton.setIdAction( nIdActionButton );
-        actionButton.setResourceType( strResourceType );
-
+        actionButton.setIdAction( existing.getIdAction( ) );
         _actionbarService.updateActionButton( actionButton );
 
-        return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
+        return redirectView( request, VIEW_MANAGE_ACTION_BUTTONS );
     }
 
     /**
@@ -386,19 +275,25 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
      * @param request The request
      * @return The next URL to redirect to
      */
-    public String confirmRemoveActionButton( HttpServletRequest request )
+    @View( value = VIEW_CONFIRM_REMOVE_ACTION_BUTTON, securityTokenAction = ACTION_REMOVE_ACTION_BUTTON )
+    public String getConfirmRemoveActionButton( HttpServletRequest request )
     {
-        String strId = request.getParameter( PARAMETER_ID_ACTION_BUTTON );
-        if ( StringUtils.isBlank( strId ) )
+        if ( !isAuthorized( ActionbarResourceIdService.PERMISSION_REMOVE_ACTION_BUTTON ) )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+            return redirectUnauthorized( request );
         }
 
-        UrlItem url = new UrlItem( JSP_URL_REMOVE_ACTION_BUTTON );
-        url.addParameter( PARAMETER_ID_ACTION_BUTTON, strId );
+        ActionButton actionButton = findActionButton( request );
+        if ( actionButton == null )
+        {
+            return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_ACTION_BUTTON_NOT_FOUND, AdminMessage.TYPE_STOP ) );
+        }
 
-        return AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_SOCIALHUB, url.getUrl( ),
-                AdminMessage.TYPE_CONFIRMATION );
+        UrlItem url = new UrlItem( getActionUrl( ACTION_REMOVE_ACTION_BUTTON ) );
+        url.addParameter( PARAMETER_ID_ACTION_BUTTON, actionButton.getIdAction( ) );
+
+        return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_CONFIRM_REMOVE_ACTION_BUTTON, url.getUrl( ),
+                AdminMessage.TYPE_CONFIRMATION ) );
     }
 
     /**
@@ -406,58 +301,118 @@ public class ActionbarJspBean extends AdminFeaturesPageJspBean
      * @param request The request
      * @return The next URL to redirect to
      */
+    @Action( ACTION_REMOVE_ACTION_BUTTON )
     public String doRemoveActionButton( HttpServletRequest request )
     {
-        String strId = request.getParameter( PARAMETER_ID_ACTION_BUTTON );
-        if ( StringUtils.isBlank( strId ) )
+        if ( !isAuthorized( ActionbarResourceIdService.PERMISSION_REMOVE_ACTION_BUTTON ) )
         {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
-        }
-        int nId = 0;
-        try
-        {
-            nId = Integer.parseInt( strId );
-        }
-        catch ( NumberFormatException e )
-        {
-            return AdminMessageService.getMessageUrl( request, MESSAGE_MANDATORY_FIELDS, AdminMessage.TYPE_STOP );
+            return redirectUnauthorized( request );
         }
 
-        _actionbarService.removeActionButton( nId );
-        return AppPathService.getBaseUrl( request ) + JSP_URL_MANAGE_ACTION_BUTTONS;
+        ActionButton actionButton = findActionButton( request );
+        if ( actionButton != null )
+        {
+            _actionbarService.removeActionButton( actionButton.getIdAction( ) );
+        }
+
+        return redirectView( request, VIEW_MANAGE_ACTION_BUTTONS );
     }
 
     /**
-     * Move an action button
+     * Move an action button up or down
      * @param request The request
-     * @return The html content to display
+     * @return The next URL to redirect to
      */
+    @Action( ACTION_MOVE_ACTION_BUTTON )
     public String doMoveActionButton( HttpServletRequest request )
     {
-        if ( !RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null,
-                ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON, AdminUserService.getAdminUser( request ) ) )
+        if ( !isAuthorized( ActionbarResourceIdService.PERMISSION_MODIFY_ACTION_BUTTON ) )
         {
-            getManageActionButtons( request );
+            return redirectUnauthorized( request );
         }
 
-        boolean bMoveUp = Boolean.parseBoolean( request.getParameter( PARAM_MOVE_UP ) );
-        String strActionId = request.getParameter( PARAMETER_ID_ACTION_BUTTON );
-        if ( StringUtils.isNumeric( strActionId ) )
+        ActionButton actionButton = findActionButton( request );
+        if ( actionButton != null )
         {
-            int nIdAction = Integer.parseInt( strActionId );
-            ActionButton actionButton = _actionbarService.findActionButton( nIdAction );
             int nOrder = actionButton.getOrder( );
-            if ( bMoveUp )
+            int nNewOrder = Boolean.parseBoolean( request.getParameter( PARAM_MOVE_UP ) ) ? nOrder - 1 : nOrder + 1;
+            if ( nNewOrder > 0 && nNewOrder < _actionbarService.getNewOrder( ) )
             {
-                nOrder--;
+                _actionbarService.updateActionButtonOrder( actionButton, nNewOrder );
             }
-            else
-            {
-                nOrder++;
-            }
-            _actionbarService.updateActionButtonOrder( actionButton, nOrder );
         }
 
-        return getManageActionButtons( request );
+        return redirectView( request, VIEW_MANAGE_ACTION_BUTTONS );
+    }
+
+    /**
+     * Tell whether the current user holds a permission on the action buttons
+     * @param strPermission The permission
+     * @return true if the user holds the permission
+     */
+    private boolean isAuthorized( String strPermission )
+    {
+        return RBACService.isAuthorized( ActionButton.RESOURCE_TYPE, null, strPermission, (User) getUser( ) );
+    }
+
+    /**
+     * Redirect to the unauthorized action message
+     * @param request The request
+     * @return The redirection
+     */
+    private String redirectUnauthorized( HttpServletRequest request )
+    {
+        return redirect( request, AdminMessageService.getMessageUrl( request, MESSAGE_UNAUTHORIZED_ACTION, AdminMessage.TYPE_STOP ) );
+    }
+
+    /**
+     * Load the action button named by the request
+     * @param request The request
+     * @return The action button, or null if the id is missing, not numeric or unknown
+     */
+    private ActionButton findActionButton( HttpServletRequest request )
+    {
+        String strId = request.getParameter( PARAMETER_ID_ACTION_BUTTON );
+        if ( !StringUtils.isNumeric( strId ) )
+        {
+            return null;
+        }
+        return _actionbarService.findActionButton( Integer.parseInt( strId ) );
+    }
+
+    /**
+     * Build an action button from the posted fields
+     * @param request The request
+     * @return The action button, or null if a mandatory field is blank
+     */
+    private ActionButton getActionButtonFromRequest( HttpServletRequest request )
+    {
+        String strName = request.getParameter( PARAM_NAME );
+        String strHtmlContent = request.getParameter( PARAM_HTML_CONTENT );
+        if ( StringUtils.isBlank( strName ) || StringUtils.isBlank( strHtmlContent ) )
+        {
+            return null;
+        }
+
+        ActionButton actionButton = new ActionButton( );
+        actionButton.setName( strName );
+        actionButton.setHtmlContent( strHtmlContent );
+        actionButton.setResourceType( StringUtils.defaultIfBlank( request.getParameter( PARAM_RESOURCE_TYPE ), ActionButton.EVERY_RESOURCE_TYPE ) );
+        return actionButton;
+    }
+
+    /**
+     * Get the resource types an action button can target, every resource type first
+     * @param locale The locale
+     * @return The resource types
+     */
+    private ReferenceList getResourceTypes( Locale locale )
+    {
+        ReferenceList refListResourceTypes = _resourceTypeService.findAllAsRef( locale );
+        ReferenceItem refItem = new ReferenceItem( );
+        refItem.setCode( ActionButton.EVERY_RESOURCE_TYPE );
+        refItem.setName( I18nService.getLocalizedString( MESSAGE_LABEL_EVERY_RESOURCE_TYPE, locale ) );
+        refListResourceTypes.add( 0, refItem );
+        return refListResourceTypes;
     }
 }

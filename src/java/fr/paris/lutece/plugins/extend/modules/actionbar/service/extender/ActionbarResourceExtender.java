@@ -36,11 +36,14 @@ package fr.paris.lutece.plugins.extend.modules.actionbar.service.extender;
 import fr.paris.lutece.plugins.extend.business.extender.ResourceExtenderDTO;
 import fr.paris.lutece.plugins.extend.modules.actionbar.business.config.ActionbarExtenderConfig;
 import fr.paris.lutece.plugins.extend.service.extender.AbstractResourceExtender;
+import fr.paris.lutece.plugins.extend.modules.actionbar.web.component.ActionbarResourceExtenderComponent;
 import fr.paris.lutece.plugins.extend.service.extender.config.IResourceExtenderConfigService;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,15 +56,38 @@ import org.apache.commons.lang3.StringUtils;
  * </strong><br />
  * Examples : @Extender[22,document,actionbar,{action:all}]@
  */
+@ApplicationScoped
+@Named( ActionbarResourceExtender.BEAN_NAME )
 public class ActionbarResourceExtender extends AbstractResourceExtender
 {
 
     /** The Constant EXTENDER_TYPE. */
     public static final String EXTENDER_TYPE = "actionbar";
 
+    /** The bean name. */
+    public static final String BEAN_NAME = "extend-actionbar.actionbarResourceExtender";
+
+    private static final String PROPERTY_TITLE_KEY = "module.extend.actionbar.extender.actionbar.label";
+
     @Inject
-    @Named( "extend-actionbar.actionbarExtenderConfigService" )
+    @Named( ActionbarExtenderConfigServiceProducer.BEAN_NAME )
     private IResourceExtenderConfigService _configService;
+
+    @Inject
+    private ActionbarResourceExtenderComponent _resourceExtenderComponent;
+
+    /**
+     * Sets the extender properties the Spring context used to declare.
+     */
+    @PostConstruct
+    void init( )
+    {
+        setKey( EXTENDER_TYPE );
+        setI18nTitleKey( PROPERTY_TITLE_KEY );
+        setConfigRequired( true );
+        setHistoryEnable( false );
+        setResourceExtenderComponent( _resourceExtenderComponent );
+    }
 
     /**
      * {@inheritDoc}

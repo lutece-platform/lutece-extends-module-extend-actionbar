@@ -33,11 +33,15 @@
  */
 package fr.paris.lutece.plugins.extend.modules.actionbar.business;
 
+import java.io.Serializable;
+
 /**
  * Action button
  */
-public class ActionButton
+public class ActionButton implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * ActionButton resource type
      */

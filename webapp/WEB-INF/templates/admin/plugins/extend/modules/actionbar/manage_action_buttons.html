@@ -1,24 +1,52 @@
-<#assign btnTools>
-	<#if permissions.ADD_ACTION_BUTTON?? && permissions.ADD_ACTION_BUTTON>
-		<@aButton href='jsp/admin/plugins/extend/modules/actionbar/GetAddActionButton.jsp' title='#i18n{module.extend.actionbar.manage_action_buttons.addActionButton}' hideTitle=['xs','sm'] buttonIcon='plus' />
-	</#if>
-</#assign>
-
-<@extendBox extendTitle='#i18n{module.extend.actionbar.manage_action_buttons.pageTitle}' hasBoxTools=true extendBoxTools=btnTools>
-	<@dataTable dataTableManager=dataTableManager actionMacro="getActionsActionButton" />
-</@extendBox>
-
-<#macro getActionsActionButton item>
-	<#if permissions.MODIFY_ACTION_BUTTON?? && permissions.MODIFY_ACTION_BUTTON>
-		<@aButton href='jsp/admin/plugins/extend/modules/actionbar/GetModifyActionButton.jsp?id_action=${item.idAction}' title='#i18n{module.extend.actionbar.manage_action_buttons.modifyActionButton}' hideTitle=['all'] buttonIcon='edit' size='sm' />
-		<#if 1 < item.order>
-			<@aButton href='jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=true' title='#i18n{module.extend.actionbar.manage_action_buttons.moveUp}' hideTitle=['all'] buttonIcon='arrow-up' size='sm' />
+<#assign manageUrl = 'jsp/admin/plugins/extend/modules/actionbar/ManageActionButtons.jsp' />
+<@pageContainer>
+	<@pageColumn>
+		<@pageHeader title='#i18n{module.extend.actionbar.manage_action_buttons.pageTitle}'>
+			<#if permissions.ADD_ACTION_BUTTON!false>
+			<@aButton href='${manageUrl}?view=createActionButton' title='#i18n{module.extend.actionbar.manage_action_buttons.addActionButton}' hideTitle=['xs','sm'] buttonIcon='plus' color='primary' />
+			</#if>
+		</@pageHeader>
+		<@messages infos=infos![] errors=errors![] warnings=warnings![] />
+		<#if action_button_list?has_content>
+			<@manageFeature>
+				<#list action_button_list as item>
+				<@manageFeatureItem>
+					<@manageFeatureItemColumn auto=true flex=false>
+						<@p class='mb-0 fw-bold'><@span class='text-muted me-2' params='title="#i18n{module.extend.actionbar.manage_action_buttons.actionbutton.order}"'>${item.order}.</@span>${item.name!}</@p>
+						<@p class='mb-0 text-muted'>#i18n{module.extend.actionbar.add_action_button.labelResourceType} : <code>${item.resourceType!}</code></@p>
+					</@manageFeatureItemColumn>
+					<@manageFeatureItemColumn align='end'>
+						<#if permissions.MODIFY_ACTION_BUTTON!false>
+						<#if 1 < item.order>
+						<@tform type='inline' action=manageUrl>
+							<@input type='hidden' name='action' value='moveActionButton' />
+							<@input type='hidden' name='id_action' value='${item.idAction?c}' />
+							<@input type='hidden' name='moveUp' value='true' />
+							<@button type='submit' title='#i18n{module.extend.actionbar.manage_action_buttons.moveUp}' hideTitle=['all'] buttonIcon='arrow-up' color='light' />
+						</@tform>
+						</#if>
+						<#if item.order < last_order>
+						<@tform type='inline' action=manageUrl>
+							<@input type='hidden' name='action' value='moveActionButton' />
+							<@input type='hidden' name='id_action' value='${item.idAction?c}' />
+							<@input type='hidden' name='moveUp' value='false' />
+							<@button type='submit' title='#i18n{module.extend.actionbar.manage_action_buttons.moveDown}' hideTitle=['all'] buttonIcon='arrow-down' color='light' />
+						</@tform>
+						</#if>
+						<@aButton href='${manageUrl}?view=modifyActionButton&amp;id_action=${item.idAction?c}' title='#i18n{module.extend.actionbar.manage_action_buttons.modifyActionButton}' hideTitle=['all'] buttonIcon='edit' />
+						</#if>
+						<#if permissions.REMOVE_ACTION_BUTTON!false>
+						<@aButton href='${manageUrl}?view=confirmRemoveActionButton&amp;id_action=${item.idAction?c}' title='#i18n{module.extend.actionbar.manage_action_buttons.removeActionButton}' hideTitle=['all'] buttonIcon='trash' color='danger' />
+						</#if>
+					</@manageFeatureItemColumn>
+				</@manageFeatureItem>
+				</#list>
+			</@manageFeature>
+			<@paginationAdmin paginator=paginator combo=1 />
+		<#else>
+			<@card>
+				<@empty title='#i18n{module.extend.actionbar.manage_action_buttons.noActionButton}' iconName='click' />
+			</@card>
 		</#if>
-		<#if item.order < last_order>
-			<@aButton href='jsp/admin/plugins/extend/modules/actionbar/DoMoveActionButtons.jsp?id_action=${item.idAction}&moveUp=false' title='#i18n{module.extend.actionbar.manage_action_buttons.moveDown}' hideTitle=['all'] buttonIcon='arrow-down' size='sm' />
-		</#if>
-	</#if>
-	<#if permissions.REMOVE_ACTION_BUTTON?? && permissions.REMOVE_ACTION_BUTTON>
-		<@aButton href='jsp/admin/plugins/extend/modules/actionbar/ConfirmRemoveActionButton.jsp?id_action=${item.idAction}' title='#i18n{module.extend.actionbar.manage_action_buttons.removeActionButton}' hideTitle=['all'] buttonIcon='trash' size='sm' color='danger' />
-	</#if>
-</#macro>
+	</@pageColumn>
+</@pageContainer>

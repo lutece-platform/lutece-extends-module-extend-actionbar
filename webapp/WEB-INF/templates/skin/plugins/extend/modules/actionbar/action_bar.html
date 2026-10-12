@@ -1,3 +1,5 @@
-<div class="pull-right btn-group">
-	<#list actions as action>${action.htmlContent}|</#list>
-</div>
+<#if actions?has_content>
+<@cSection type='div' class='extend-actionbar d-flex flex-wrap justify-content-end gap-2'>
+	<#list actions as action>${action.htmlContent}</#list>
+</@cSection>
+</#if>

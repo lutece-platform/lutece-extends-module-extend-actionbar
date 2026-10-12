@@ -39,6 +39,8 @@ import fr.paris.lutece.plugins.extend.modules.actionbar.business.ActionButton;
 import fr.paris.lutece.plugins.extend.modules.actionbar.business.config.ActionbarExtenderConfig;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.ActionbarService;
 import fr.paris.lutece.plugins.extend.modules.actionbar.service.extender.ActionbarResourceExtender;
+import fr.paris.lutece.plugins.extend.modules.actionbar.service.extender.ActionbarExtenderConfigServiceProducer;
+import fr.paris.lutece.plugins.extend.service.extender.IResourceExtender;
 import fr.paris.lutece.plugins.extend.service.extender.config.IResourceExtenderConfigService;
 import fr.paris.lutece.plugins.extend.util.ExtendErrorException;
 import fr.paris.lutece.plugins.extend.web.component.AbstractResourceExtenderComponent;
@@ -51,9 +53,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -63,6 +66,7 @@ import org.apache.commons.lang3.StringUtils;
  * ActionbarResourceExtenderComponent
  * 
  */
+@ApplicationScoped
 public class ActionbarResourceExtenderComponent extends AbstractResourceExtenderComponent
 {
     // TEMPLATES
@@ -80,10 +84,22 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
 
     // SERVICES
     @Inject
-    @Named( "extend-actionbar.actionbarExtenderConfigService" )
+    @Named( ActionbarExtenderConfigServiceProducer.BEAN_NAME )
     private IResourceExtenderConfigService _configService;
     @Inject
     private ActionbarService _actionbarService;
+    @Inject
+    @Named( ActionbarResourceExtender.BEAN_NAME )
+    private IResourceExtender _resourceExtender;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public IResourceExtender getResourceExtender( )
+    {
+        return _resourceExtender;
+    }
 
     /**
      * {@inheritDoc}
@@ -105,6 +121,10 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
         // Method to get the html code of the extension in front office
         ActionbarExtenderConfig config = _configService.find( ActionbarResourceExtender.EXTENDER_TYPE,
                 strIdExtendableResource, strExtendableResourceType );
+        if ( config == null )
+        {
+            return StringUtils.EMPTY;
+        }
         List<ActionButton> listActionsButtons;
         if ( config.getAllButtons( ) )
         {
@@ -117,8 +137,8 @@ public class ActionbarResourceExtenderComponent extends AbstractResourceExtender
         for ( ActionButton action : listActionsButtons )
         {
             String strHtmlContent = action.getHtmlContent( );
-            strHtmlContent = strHtmlContent.replaceAll( PARAMETER_RESOURCE_ID, strIdExtendableResource );
-            strHtmlContent = strHtmlContent.replaceAll( PARAMETER_RESOURCE_TYPE, strExtendableResourceType );
+            strHtmlContent = strHtmlContent.replace( PARAMETER_RESOURCE_ID, strIdExtendableResource );
+            strHtmlContent = strHtmlContent.replace( PARAMETER_RESOURCE_TYPE, strExtendableResourceType );
             action.setHtmlContent( strHtmlContent );
         }
 
